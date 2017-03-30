@@ -1,0 +1,36 @@
+{
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
+  "rules": {
+    "quotes": ["error", "single"],
+    "semi": ["error", "always"],
+
+    "comma-spacing": ["error", { "before": false, "after": true }],
+
+    /*    "space-in-brackets": ["error", "always", {
+          "singleValue": false,
+          "objectsInArrays": false,
+          "arraysInArrays": false,
+          "arraysInObjects": false,
+          "objectsInObjects": false,
+          "propertyName": true
+        }],*/
+
+    "object-curly-spacing": ["error", "always"],
+    "func-call-spacing": ["error", "never"],
+    "space-in-parens": ["error", "never"],
+
+
+    // override default options for rules from base configurations
+    "comma-dangle": ["error", "never"],
+    "no-cond-assign": ["error", "always"],
+
+    // disable rules from base configurations
+    "no-console": "off",
+    "no-debugger": 0,
+    "no-undef": "off"
+  }
+}
