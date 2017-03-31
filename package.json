@@ -4,7 +4,7 @@
   "description": "Wall of Sayings",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "DorianSyruss",
@@ -16,8 +16,10 @@
     "stylelint-config-standard": "^16.0.0"
   },
   "dependencies": {
+    "bluebird": "^3.5.0",
     "ejs": "^2.5.6",
     "express": "^4.15.2",
+    "mongoose": "^4.9.2",
     "nib": "^1.1.2"
   }
 }
