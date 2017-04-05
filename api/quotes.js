@@ -26,10 +26,8 @@ function getQuote(req, res, next) {
 }
 
 function createQuote(req, res, next){
-  Quote.create({
-    quote: req.body.quote,
-    author: req.body.author
-  })
+  let { quote, author } = req.body;
+  Quote.create({ quote, author })
     .then(quote => res.status(HTTPStatus.OK).send(quote))
     .catch(err => next(err));
 }
@@ -49,7 +47,7 @@ function deleteQuotes(req, res, next) {
 function updateQuote(req, res, next) {
   let update = { quote: req.body.quote, author: req.body.author };
   Quote.findOneAndUpdate(req.params.id, update, { new: true })
-    .then((quote) => res.status(HTTPStatus.OK).send(quote))
+    .then(quote => res.status(HTTPStatus.OK).send(quote))
     .catch(err => next(err));
 }
 

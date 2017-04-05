@@ -1,3 +1,5 @@
+'use strict';
+
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
@@ -12,3 +14,4 @@ quote.methods.getAuthor = function () {
 };
 
 module.exports = mongoose.model('Quote', quote);
+
