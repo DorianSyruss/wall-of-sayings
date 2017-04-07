@@ -8,7 +8,7 @@ const user = new Schema({
   surname: 'string'
 });
 
-user.method.getFullName = function () {
+user.methods.getFullName = function () {
   return this.name + this.surname;
 };
 

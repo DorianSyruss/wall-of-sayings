@@ -42,15 +42,3 @@ let port = process.env.PORT || 8080;
 // tell the app to listen on specified port
 app.listen(port);
 console.log('Server running on port: ' + port);
-
-/* Add some data to db */
-//
-// User({
-//   name: 'Pero',
-//   surname: 'Peric'
-// }).save();
-//
-// Quote({
-//   quote: 'Whats up',
-//   author: 'Ivan S'
-// }).save();
