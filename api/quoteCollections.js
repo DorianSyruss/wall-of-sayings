@@ -1,6 +1,7 @@
 'use strict';
 
 const router = require('express').Router();
+const util = require('../utils/quoteCollections');
 const Quote = require('../models/quote.js');
 const QuoteCollection = require('../models/quoteCollection.js');
 const HTTPStatus = require('http-status');
@@ -11,7 +12,8 @@ router.get('/collections/:id', getQuoteCollection);
 router.post('/collections', createQuoteCollection);
 router.delete('/collections/:id', deleteQuoteCollection);
 router.put('/collections/:id', updateQuoteCollection);
-router.post('/collections/:id/quotes', addNewQuote);
+router.post('/collections/:id/quotes/', addNewQuote);
+router.get('/collections/:id/quotes/', listCollectionQuotes);
 
 module.exports = router;
 
@@ -64,9 +66,11 @@ function addNewQuote(req, res, next) {
   });
 }
 
-
-
-
-
+function listCollectionQuotes(req, res, next) {
+  util.getQuotes(req.params.id)
+    .then(quotes => {
+      res.send(quotes);
+    });
+}
 
 
