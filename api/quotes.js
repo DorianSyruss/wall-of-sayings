@@ -26,7 +26,7 @@ function getQuote(req, res, next) {
 
 function createQuote(req, res, next){
   let { quote, author } = req.body;
-  Quote.create(quote, author)
+  Quote.createOne(quote, author)
     .then(quote => res.status(HTTPStatus.OK).send(quote))
     .catch(err => next(err));
 }

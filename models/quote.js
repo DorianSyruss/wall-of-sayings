@@ -24,7 +24,7 @@ quote.statics.getOne = function(id) {
   return this.findById(id);
 };
 
-quote.statics.create = function(quote, author) {
+quote.statics.createOne = function(quote, author) {
   return this.create({ quote, author });
 };
 

@@ -4,18 +4,20 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const quoteCollection = new Schema({
-  author: 'string',
+  owner: Schema.ObjectId, //make owner_name attr, pull from the id of owner
   title: 'string',
   description: 'string',
   category: 'string',
-  quote_ids: [Schema.ObjectId]
+  quotes: [Schema.ObjectId],
+  collaborators: [Schema.ObjectId]
 });
 
 quoteCollection.methods.addQuote = function (quote_id) {
-  // this.quote_ids.push(quote_id);
-  // return this.save();
+  return this.update({ $addToSet: { quotes: quote_id } });
+};
 
-  return this.update({ $addToSet: { quote_ids: quote_id } });
+quoteCollection.methods.addCollaborator = function (collaborator_id) {
+  return this.update({ $addToSet: { collaborators: collaborator_id } });
 };
 
 module.exports = mongoose.model('QuoteCollection', quoteCollection);
