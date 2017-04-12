@@ -4,12 +4,14 @@ const mongoose = require('mongoose');
 const { Schema } = require('mongoose');
 
 const user = new Schema({
-  name: 'string',
-  surname: 'string'
+  name: String,
+  surname: String
 });
 
-user.methods.getFullName = function () {
-  return this.name + this.surname;
-};
+Object.assign(user.methods, {
+  getFullName() {
+    return `${this.name} ${this.surname}`;
+  }
+});
 
 module.exports = mongoose.model('User', user);

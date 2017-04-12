@@ -1,28 +1,24 @@
 'use strict';
 
-const router = require('express').Router();
-const util = require('../utils/quoteCollections.js');
-const Quote = require('../models/quote.js');
 const QuoteCollection = require('../models/quoteCollection.js');
+const router = require('express').Router();
 const HTTPStatus = require('http-status');
 
 router.get('/collections', listQuoteCollections);
-router.get('/collections/filter', findByAttribute); //on the same route /collections that supports filtering
-router.get('/collections/:id', getQuoteCollection);
 router.post('/collections', createQuoteCollection);
-router.delete('/collections/:id', deleteQuoteCollection);
+router.get('/collections/:id', getQuoteCollection);
 router.put('/collections/:id', updateQuoteCollection);
+router.delete('/collections/:id', deleteQuoteCollection);
+router.post('/collections/:id/', addNewCollaborator);
 router.get('/collections/:id/quotes', listCollectionQuotes);
 router.post('/collections/:id/quotes', addNewQuote);
-router.post('/collections/:id/', addNewCollaborator);
+router.delete('/collections/:id/quotes', deleteQuote);
 //router.delete('/collections/:id/', removeCollaborator);
 
 module.exports = router;
 
 function listQuoteCollections(req, res, next) {
-  let owner_id = req.query.owner;
-
-  QuoteCollection.find({ owner_id })
+  QuoteCollection.find(req.query)
     .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
     .catch(err => next(err));
 }
@@ -33,16 +29,9 @@ function getQuoteCollection(req, res, next) {
     .catch(err => next(err));
 }
 
-function findByAttribute(req, res, next) {
-  QuoteCollection.find({ category: req.query.category })
-    .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
-    .catch(err => next(err));
-}
-
 function createQuoteCollection(req, res, next){
-  let owner = req.query.owner;
-  let { title, description, category } = req.body;
-  QuoteCollection.create({ owner, title, description, category })
+  let collection = Object.assign({}, req.body, { owner: req.query.owner });
+  QuoteCollection.create(collection)
     .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
     .catch(err => next(err));
 }
@@ -54,32 +43,44 @@ function deleteQuoteCollection(req, res, next){
 }
 
 function updateQuoteCollection(req, res, next) {
-  let update = { title: req.body.title,
-  description: req.body.description, category: req.body.category };
+  let update = {
+    title: req.body.title,
+    description: req.body.description,
+    category: req.body.category
+  };
+
   QuoteCollection.findOneAndUpdate(req.params.id, update, { new: true })
     .then(quote => res.status(HTTPStatus.OK).send(quote))
     .catch(err => next(err));
 }
 
 function addNewQuote(req, res, next) {
-  Quote.getOne(req.body.quote_id)
-    .then(quote => {
-      QuoteCollection.findById(req.params.id)
-        .then(quoteCollection => quoteCollection.addQuote(quote._id))
-        .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
-        .catch(err => next(err));
-  });
-}
-
-function addNewCollaborator(req, res, next) {
     QuoteCollection.findById(req.params.id)
-      .then(quoteCollection => quoteCollection.addCollaborator(req.query.collaborator))
-      .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
+      .then(quoteCollection => quoteCollection.addQuote(req.body.quote_id))
+      .then(status => res.status(HTTPStatus.OK).send(status))
       .catch(err => next(err));
 }
 
+function deleteQuote(req, res, next) {
+  let quote_ids = req.body.quote_ids || [];
+  QuoteCollection.findById(req.params.id)
+    .then(quoteCollection => quoteCollection.deleteQuote(quote_ids))
+    .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
+    .catch(err => next(err));
+}
+
+function addNewCollaborator(req, res, next) {
+  QuoteCollection.findById(req.params.id)
+    .then(quoteCollection => quoteCollection.addCollaborator(req.query.collaborator))
+    .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
+    .catch(err => next(err));
+}
+
 function listCollectionQuotes(req, res, next) {
-  util.getQuotes(req.params.id)
+  QuoteCollection.findById(req.params.id)
+    .then(collection => collection.getQuotes())
     .then(quotes => { res.status(HTTPStatus.OK).send(quotes); })
     .catch(err => next(err));
 }
+
+

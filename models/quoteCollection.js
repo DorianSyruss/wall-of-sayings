@@ -2,22 +2,40 @@
 
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
+const { ObjectId } = Schema;
 
 const quoteCollection = new Schema({
-  owner: Schema.ObjectId, //make owner_name attr, pull from the id of owner
-  title: 'string',
-  description: 'string',
-  category: 'string',
-  quotes: [Schema.ObjectId],
-  collaborators: [Schema.ObjectId]
+  owner: ObjectId, //make owner_name attr, pull from the id of owner
+  title: String,
+  description: String,
+  category: String,
+  quotes: [ObjectId],
+  collaborators: [ObjectId]
 });
 
-quoteCollection.methods.addQuote = function (quote_id) {
-  return this.update({ $addToSet: { quotes: quote_id } });
-};
+Object.assign(quoteCollection.methods, {
+  addQuote(quoteId) {
+    return this.update({ $addToSet: { quotes: quoteId } });
+  },
 
-quoteCollection.methods.addCollaborator = function (collaborator_id) {
-  return this.update({ $addToSet: { collaborators: collaborator_id } });
-};
+  deleteQuotes(quoteIds) {
+    this.quotes.remove(...quoteIds);
+    return this.save();
+  },
+
+  deleteQuote(quoteId) {
+    console.log(quoteId);
+    return this.deleteQuotes(quoteId);
+  },
+
+  getQuotes() {
+    const Quote = mongoose.model('Quote');
+    return Promise.all(this.quote_id.map(id => Quote.findById(id)));
+  },
+
+  addCollaborator(collaborator_id) {
+    return this.update({ $addToSet: { collaborators: collaborator_id } });
+  }
+});
 
 module.exports = mongoose.model('QuoteCollection', quoteCollection);

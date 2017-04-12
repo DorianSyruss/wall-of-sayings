@@ -9,17 +9,20 @@ const bodyParser = require('body-parser');
 const HTTPStatus = require('http-status');
 const app = express();
 mongoose.Promise = require('bluebird');
-mongoose.connect('mongodb://localhost/test', { config: { autoIndex: false } });
+
+const mongoUri = `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`;
+mongoose.connect(mongoUri, {
+  user: process.env.DB_USER,
+  pass: process.env.DB_PASSWORD,
+  config: { autoIndex: false }
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-let db = mongoose.connection;
-
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function () {
-  console.log('connection established');
-});
+const db = mongoose.connection;
+db.on('error', e => console.error('connection error:', e));
+db.once('open', () => console.log('connection established', mongoUri));
 
 app.use(express.static(__dirname + '/public'));
 
