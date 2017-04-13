@@ -9,11 +9,11 @@ router.post('/collections', createQuoteCollection);
 router.get('/collections/:id', getQuoteCollection);
 router.put('/collections/:id', updateQuoteCollection);
 router.delete('/collections/:id', deleteQuoteCollection);
-router.post('/collections/:id/', addNewCollaborator);
+router.post('/collections/:id/collaborators', addNewCollaborator);
+router.delete('/collections/:id/collaborators', removeCollaborators);
 router.get('/collections/:id/quotes', listCollectionQuotes);
 router.post('/collections/:id/quotes', addNewQuote);
 router.delete('/collections/:id/quotes', deleteQuote);
-//router.delete('/collections/:id/', removeCollaborator);
 
 module.exports = router;
 
@@ -57,7 +57,7 @@ function updateQuoteCollection(req, res, next) {
 function addNewQuote(req, res, next) {
     QuoteCollection.findById(req.params.id)
       .then(quoteCollection => quoteCollection.addQuote(req.body.quote_id))
-      .then(status => res.status(HTTPStatus.OK).send(status))
+      .then(queryStatus => res.status(HTTPStatus.OK).send(queryStatus))
       .catch(err => next(err));
 }
 
@@ -70,9 +70,18 @@ function deleteQuote(req, res, next) {
 }
 
 function addNewCollaborator(req, res, next) {
+  let collaborator_ids = req.body.collaborator_ids || [];
   QuoteCollection.findById(req.params.id)
-    .then(quoteCollection => quoteCollection.addCollaborator(req.query.collaborator))
-    .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
+    .then(quoteCollection => quoteCollection.addCollaborators(collaborator_ids))
+    .then(queryStatus => res.status(HTTPStatus.OK).send(queryStatus))
+    .catch(err => next(err));
+}
+
+function removeCollaborators(req, res, next){
+  let collaborator_ids = req.body.collaborator_ids || [];
+  QuoteCollection.findById(req.params.id)
+    .then(quoteCollection => quoteCollection.removeCollaborators(collaborator_ids))
+    .then(queryStatus => res.status(HTTPStatus.OK).send(queryStatus))
     .catch(err => next(err));
 }
 

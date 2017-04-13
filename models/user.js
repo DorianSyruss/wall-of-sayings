@@ -4,8 +4,10 @@ const mongoose = require('mongoose');
 const { Schema } = require('mongoose');
 
 const user = new Schema({
+  facebook_id: String,
   name: String,
-  surname: String
+  surname: String,
+  email: String
 });
 
 Object.assign(user.methods, {

@@ -24,7 +24,6 @@ Object.assign(quoteCollection.methods, {
   },
 
   deleteQuote(quoteId) {
-    console.log(quoteId);
     return this.deleteQuotes(quoteId);
   },
 
@@ -33,8 +32,13 @@ Object.assign(quoteCollection.methods, {
     return Promise.all(this.quote_id.map(id => Quote.findById(id)));
   },
 
-  addCollaborator(collaborator_id) {
-    return this.update({ $addToSet: { collaborators: collaborator_id } });
+  addCollaborators(collaborator_ids) {
+    return this.update({ $addToSet: { collaborators: { $each: collaborator_ids } } });
+  },
+
+  removeCollaborators(collaborators_ids) {
+    this.collaborators.remove(...collaborators_ids);
+    return this.save();
   }
 });
 

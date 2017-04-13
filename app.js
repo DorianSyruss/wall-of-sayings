@@ -2,6 +2,7 @@
 
 //require needed dependencies
 require('dotenv').config();
+const passport = require('passport');
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -26,13 +27,23 @@ db.once('open', () => console.log('connection established', mongoUri));
 
 app.use(express.static(__dirname + '/public'));
 
-// create route for '/' and render the 'index.js.ejs' file to the browser
-app.get('/', function (req, res) {
-  res.render('index');
-});
-
 // add api routes
 require('./api')(app);
+
+app.use('/login/facebook',
+  passport.authenticate('facebook', { scope : 'email' }
+  ));
+
+// handle the callback after facebook has authenticated the user
+app.use('/login/facebook/callback',
+  passport.authenticate('facebook', {
+    successRedirect : '/home',
+    failureRedirect : '/'
+  })
+);
+
+// app.post('/login', passport.authenticate('local', { successRedirect: './api(app)',
+// failureRedirect: '/login' }));
 
 // global error handler
 app.use((err, req, res, next) => {
