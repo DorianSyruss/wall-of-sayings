@@ -3,6 +3,7 @@
 //require needed dependencies
 require('dotenv').config();
 const passport = require('passport');
+const facebook = require('./passport/facebook.js').facebook;
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -30,6 +31,13 @@ app.use(express.static(__dirname + '/public'));
 // add api routes
 require('./api')(app);
 
+// passport.use()({
+//   usernameField: 'email'
+// }), facebook;
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/login/facebook',
   passport.authenticate('facebook', { scope : 'email' }
   ));
@@ -37,13 +45,14 @@ app.use('/login/facebook',
 // handle the callback after facebook has authenticated the user
 app.use('/login/facebook/callback',
   passport.authenticate('facebook', {
-    successRedirect : '/home',
+    successRedirect : '/api/users',
     failureRedirect : '/'
   })
 );
 
 // app.post('/login', passport.authenticate('local', { successRedirect: './api(app)',
-// failureRedirect: '/login' }));
+// failureRedirect: '/login',
+// }));
 
 // global error handler
 app.use((err, req, res, next) => {
