@@ -1,40 +1,44 @@
+const credentials = require('../credentials.json');
+const User = require('../models/user');
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
-const User = require('../models/user');
 
 passport.use(new FacebookStrategy({
-  clientID: '441278002882363',
-  clientSecret: 'a26d20d786dd26db5ab9352fb94b6c1a',
-  callbackURL: 'https://lrckbeatxf.localtunnel.me/login/facebook/callback',
-  profile_Fields: ['id', 'name', 'familyName', 'photos', 'emails']
-},
-// facebook will send back the tokens and profile
-exports.facebook = function (access_token, refresh_token, profile, done) {
+    clientID: credentials.facebook.app_id,
+    clientSecret: credentials.facebook.app_secret,
+    callbackURL: credentials.facebook.callback,
+    profileFields: ['id', 'displayName', 'emails', 'gender']
+  },
 
-  // find the user in the database based on their facebook id
-  User.find({ 'facebook_id': profile.id }, function (err, user) {
+  function (accessToken, refreshToken, profile, done) {
+    let user = new User({
+      facebook_id: profile.id,
+      email: profile.emails[0].value,
+      name: profile.displayName,
+      gender: profile.gender
+    });
 
-    if (err)
-      return done(err);
+    User.findOne({ facebook_id: user.facebook_id } || { email: user.email }, (err, user) => {
+      if(user){
+        user.save((err, user) => {
+          if(err) return done(err);
+          done(null, user);
+        });
+      } else {
+        done(null, user);
+      }
+    });
+  }
+));
 
-    if (user) {
-      return done(null, user); // user found, return that user
-
-    } else {
-      let userData = {
-        facebook_id: profile.id,
-        name: profile.name,
-        lastName: profile.familyName,
-        email: profile.emails[0].value
-      };
-      User.create({ userData })
-        .then((user) => done(null, user));
-    }}
-  );
-}));
-
-passport.serializeUser(function(user, done) {
-  done(null, user);
+passport.serializeUser((user, done) => {
+  done(null, user._id);
 });
 
+passport.deserializeUser((id, done) => {
+  user.findById(id, function (err, user) {
+    done(err, user);
+  });
+});
 
+module.exports = passport;

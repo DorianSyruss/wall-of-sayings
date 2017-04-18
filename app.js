@@ -2,8 +2,7 @@
 
 //require needed dependencies
 require('dotenv').config();
-const passport = require('passport');
-const facebook = require('./passport/facebook.js').facebook;
+const passport = require('./passport/facebook');
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -21,6 +20,8 @@ mongoose.connect(mongoUri, {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 const db = mongoose.connection;
 db.on('error', e => console.error('connection error:', e));
@@ -31,28 +32,10 @@ app.use(express.static(__dirname + '/public'));
 // add api routes
 require('./api')(app);
 
-// passport.use()({
-//   usernameField: 'email'
-// }), facebook;
+app.get('/auth/facebook', passport.authenticate('facebook', { scope: "email" }));
+app.get('/auth/facebook/callback', passport.authenticate('facebook',
+  { successRedirect: '/api/users', failureRedirect: '/login' }));
 
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use('/login/facebook',
-  passport.authenticate('facebook', { scope : 'email' }
-  ));
-
-// handle the callback after facebook has authenticated the user
-app.use('/login/facebook/callback',
-  passport.authenticate('facebook', {
-    successRedirect : '/api/users',
-    failureRedirect : '/'
-  })
-);
-
-// app.post('/login', passport.authenticate('local', { successRedirect: './api(app)',
-// failureRedirect: '/login',
-// }));
 
 // global error handler
 app.use((err, req, res, next) => {

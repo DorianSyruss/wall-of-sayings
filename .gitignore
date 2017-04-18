@@ -1,6 +1,7 @@
 node_modules/
-.idea/
 dist/
-stats.json
+.idea/
+*.env
 *.log
-.env*
+stats.json
+credentials.json

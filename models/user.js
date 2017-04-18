@@ -4,9 +4,10 @@ const mongoose = require('mongoose');
 const { Schema } = require('mongoose');
 
 const user = new Schema({
-  facebook_id: String,
+  facebook_id: Number,
   name: String,
   surname: String,
+  gender: String,
   email: String
 });
 
