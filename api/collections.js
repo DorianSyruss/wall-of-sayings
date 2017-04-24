@@ -1,8 +1,9 @@
 'use strict';
 
-const QuoteCollection = require('../models/quoteCollection.js');
-const router = require('express').Router();
 const HTTPStatus = require('http-status');
+const router = require('express').Router();
+
+const QuoteCollection = require('../models/quoteCollection.js');
 
 router.get('/collections', listQuoteCollections);
 router.post('/collections', createQuoteCollection);
@@ -43,13 +44,7 @@ function deleteQuoteCollection(req, res, next){
 }
 
 function updateQuoteCollection(req, res, next) {
-  let update = {
-    title: req.body.title,
-    description: req.body.description,
-    category: req.body.category
-  };
-
-  QuoteCollection.findOneAndUpdate(req.params.id, update, { new: true })
+  QuoteCollection.findOneAndUpdate(req.params.id, req.body, { new: true })
     .then(quote => res.status(HTTPStatus.OK).send(quote))
     .catch(err => next(err));
 }

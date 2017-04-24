@@ -1,15 +1,13 @@
 'use strict';
 
-//require needed dependencies
 require('dotenv').config();
-const passport = require('./passport/facebook');
-
 const express = require('express');
+const passport = require('./auth/facebook');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const HTTPStatus = require('http-status');
-const app = express();
 mongoose.Promise = require('bluebird');
+const app = express();
 
 const mongoUri = `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`;
 mongoose.connect(mongoUri, {
@@ -32,7 +30,7 @@ app.use(express.static(__dirname + '/public'));
 // add api routes
 require('./api')(app);
 
-app.get('/auth/facebook', passport.authenticate('facebook', { scope: "email" }));
+app.get('/auth/facebook', passport.authenticate('facebook', { scope: 'email' }));
 app.get('/auth/facebook/callback', passport.authenticate('facebook',
   { successRedirect: '/api/users', failureRedirect: '/login' }));
 

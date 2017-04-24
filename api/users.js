@@ -1,14 +1,15 @@
 'use strict';
 
-const User = require('../models/user.js');
-const router = require('express').Router();
 const HTTPStatus = require('http-status');
+const router = require('express').Router();
+
+const User = require('../models/user.js');
 
 router.get('/users', listUsers);
-router.get('/users/:id', getUser);
 router.post('/users', createUser);
-router.delete('/users/:id', deleteUser);
+router.get('/users/:id', getUser);
 router.put('/users/:id', updateUser);
+router.delete('/users/:id', deleteUser);
 
 module.exports = router;
 

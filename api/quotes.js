@@ -5,10 +5,10 @@ const router = require('express').Router();
 const HTTPStatus = require('http-status');
 
 router.get('/quotes', listQuotes);
-router.get('/quotes/:id', getQuote);
 router.post('/quotes', createQuote);
-router.delete('/quotes/:id', deleteQuote);
+router.get('/quotes/:id', getQuote);
 router.put('/quotes/:id', updateQuote);
+router.delete('/quotes/:id', deleteQuote);
 
 module.exports = router;
 
