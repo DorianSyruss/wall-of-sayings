@@ -1,6 +1,7 @@
+'use strict';
+
 const getProp = require('lodash/get');
 const User = require('../models/user');
-const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
 const credentials = require('../credentials.json');
 
@@ -11,11 +12,7 @@ const auth = new FacebookStrategy({
   profileFields: ['id', 'displayName', 'emails', 'gender']
 }, authorize);
 
-module.exports = passport;
-
-passport.use(auth);
-passport.serializeUser((user, done) => done(null, user._id));
-passport.deserializeUser((id, done) => User.findById(id, done));
+module.exports = auth;
 
 function authorize(accessToken, refreshToken, profile, done) {
   let facebookId = profile.facebook_id;

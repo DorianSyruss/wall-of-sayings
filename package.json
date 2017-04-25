@@ -26,6 +26,7 @@
     "mongoose": "^4.9.2",
     "nib": "^1.1.2",
     "passport": "^0.3.2",
-    "passport-facebook": "^2.1.1"
+    "passport-facebook": "^2.1.1",
+    "passport-local": "^1.0.0"
   }
 }

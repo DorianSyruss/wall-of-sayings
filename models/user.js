@@ -8,12 +8,17 @@ const user = new Schema({
   name: String,
   surname: String,
   gender: String,
-  email: String
+  email: String,
+  password: String
 });
 
 Object.assign(user.methods, {
   getFullName() {
     return `${this.name} ${this.surname}`;
+  },
+  //just test, implement hash and compare
+  validPassword(password) {
+    return true;
   }
 });
 
