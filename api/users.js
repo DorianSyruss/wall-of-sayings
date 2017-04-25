@@ -26,8 +26,7 @@ function getUser(req, res, next) {
 }
 
 function createUser(req, res, next) {
-  let { name, surname } = req.body;
-  User.create({ name, surname })
+  User.create(req.body)
     .then(user => res.status(HTTPStatus.OK).send(user))
     .catch(err => next(err));
 }

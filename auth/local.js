@@ -7,12 +7,18 @@ const auth = new LocalStrategy((username, password, done) => {
   User.findOne({ email: username }, (err, user) => {
     if (err) return done(err);
     if (!user) return done(null, false, { message: 'Incorrect username.' });
-    if (!user.validPassword(password)) return done(null, false, { message: 'Incorrect password.' });
-    return done(null, user);
+    user.validPassword(password, (err, valid) => {
+      if (err || !valid) {
+        done(null, false, { message: 'Incorrect password.' });
+      }
+      return done(null, user);
+    });
   });
 });
 
 module.exports = auth;
+
+
 
 
 //WIP

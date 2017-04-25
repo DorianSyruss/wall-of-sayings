@@ -35,10 +35,8 @@ app.get('/auth/facebook/callback', passport.authenticate('facebook',
   { successRedirect: '/api/users', failureRedirect: '/login' }));
 
 
-app.post('/auth/login', passport.authenticate('local', { failureRedirect: '/api/users' }),
-(req, res) => {
-  res.redirect('/api/collections/');
-});
+app.post('/auth/login', passport.authenticate('local', { failureRedirect: '/api/users',
+successRedirect:'/api/collections' })),
 
 // global error handler
 app.use((err, req, res, next) => {

@@ -17,6 +17,7 @@
     "stylelint-config-standard": "^16.0.0"
   },
   "dependencies": {
+    "bcrypt": "^1.0.2",
     "bluebird": "^3.5.0",
     "dotenv": "^4.0.0",
     "ejs": "^2.5.6",
