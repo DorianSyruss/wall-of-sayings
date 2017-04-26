@@ -32,7 +32,7 @@ Object.assign(user.methods, {
   getFullName() {
     return `${this.name} ${this.surname}`;
   },
-  //just test, implement hash and compare
+
   validPassword(password, cb) {
     bcrypt.compare(password, this.password, cb);
   }

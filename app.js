@@ -2,6 +2,7 @@
 
 require('dotenv').config();
 const express = require('express');
+const session = require('express-session');
 const passport = require('./auth');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -18,6 +19,12 @@ mongoose.connect(mongoUri, {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true }
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 

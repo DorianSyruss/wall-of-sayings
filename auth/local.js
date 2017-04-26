@@ -9,25 +9,13 @@ const auth = new LocalStrategy((username, password, done) => {
     if (!user) return done(null, false, { message: 'Incorrect username.' });
     user.validPassword(password, (err, valid) => {
       if (err || !valid) {
-        done(null, false, { message: 'Incorrect password.' });
+       return done(null, false, { message: 'Incorrect password.' });
       }
       return done(null, user);
     });
   });
 });
 
+
 module.exports = auth;
 
-
-
-
-//WIP
-
-// app.post('/register', (req, res) => {
-//   User.create({
-//     firstName: req.body.firstName,
-//     lastName: req.body.lastName,
-//     password: req.body.password,
-//     email: req.body.email
-//   }, done());
-// });
