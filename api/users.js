@@ -2,10 +2,10 @@
 
 const HTTPStatus = require('http-status');
 const router = require('express').Router();
+const User = require('../models/user');
+const { isAdmin } = require('../auth/permissions');
 
-const User = require('../models/user.js');
-
-router.get('/users', listUsers);
+router.get('/users', isAdmin, listUsers);
 router.post('/users', createUser);
 router.get('/users/:id', getUser);
 router.put('/users/:id', updateUser);
@@ -13,7 +13,8 @@ router.delete('/users/:id', deleteUser);
 
 module.exports = router;
 
-function listUsers(req, res){
+function listUsers(req, res, next){
+  console.log('lala');
   User.find()
     .then(user => res.status(HTTPStatus.OK).send(user))
     .catch(err => next(err));

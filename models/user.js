@@ -6,13 +6,28 @@ const { Schema } = require('mongoose');
 
 const SALT_WORK_FACTOR = 8;
 
+const Role = {
+  Admin: 0,
+  User: 1,
+
+  isValid(val) {
+    let role = parseInt(val, 10);
+    if (isNaN(role)) return false;
+    return Object.keys(Role).reduce((acc, key) => {
+      let val = Role[key];
+      return acc || val === role;
+    }, false);
+  }
+};
+
 const user = new Schema({
   facebook_id: Number,
   name: String,
   surname: String,
   gender: String,
   email: String,
-  password: String
+  password: String,
+  role: { type: Number, default: Role.User, validate: Role.isValid }
 });
 
 user.pre('save', function (next) {

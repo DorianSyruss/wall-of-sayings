@@ -2,8 +2,7 @@
 
 const HTTPStatus = require('http-status');
 const router = require('express').Router();
-
-const QuoteCollection = require('../models/quoteCollection.js');
+const QuoteCollection = require('../models/quoteCollection');
 
 router.get('/collections', listQuoteCollections);
 router.post('/collections', createQuoteCollection);

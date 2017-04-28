@@ -1,9 +1,9 @@
 'use strict';
 
 require('dotenv').config();
+const passport = require('./auth');
 const express = require('express');
 const session = require('express-session');
-const passport = require('./auth');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const HTTPStatus = require('http-status');
@@ -22,8 +22,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
   secret: 'keyboard cat',
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: true }
+  saveUninitialized: true
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -42,8 +41,8 @@ app.get('/auth/facebook/callback', passport.authenticate('facebook',
   { successRedirect: '/api/users', failureRedirect: '/login' }));
 
 
-app.post('/auth/login', passport.authenticate('local', { failureRedirect: '/api/users',
-successRedirect:'/api/collections' })),
+app.post('/auth/login', passport.authenticate('local', { failureRedirect: '/api/quotes',
+successRedirect:'/api/users' }));
 
 // global error handler
 app.use((err, req, res, next) => {

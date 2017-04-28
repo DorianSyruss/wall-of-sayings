@@ -1,7 +1,7 @@
 'use strict';
 
-const quotes = require('./quotes.js');
-const users = require('./users.js');
+const quotes = require('./quotes');
+const users = require('./users');
 
 const quoteCollections = require('./collections.js');
 
