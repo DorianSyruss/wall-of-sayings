@@ -3,12 +3,11 @@
 const getProp = require('lodash/get');
 const User = require('../models/user');
 const FacebookStrategy = require('passport-facebook').Strategy;
-const credentials = require('../credentials.json');
 
 const auth = new FacebookStrategy({
-  clientID: credentials.facebook.app_id,
-  clientSecret: credentials.facebook.app_secret,
-  callbackURL: credentials.facebook.callback,
+  clientID: process.env.FB_APP_ID,
+  clientSecret: process.env.FB_APP_SECRET,
+  callbackURL: process.env.FB_CALLBACK_URL,
   profileFields: ['id', 'displayName', 'emails', 'gender']
 }, authorize);
 

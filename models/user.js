@@ -20,17 +20,17 @@ const Role = {
   }
 };
 
-const user = new Schema({
+const User = new Schema({
   facebook_id: Number,
   name: String,
   surname: String,
   gender: String,
-  email: String,
+  email: { type: String, unique: true },
   password: String,
   role: { type: Number, default: Role.User, validate: Role.isValid }
 });
 
-user.pre('save', function (next) {
+User.pre('save', function (next) {
   if (!this.isModified('password')) next();
 
   bcrypt.genSalt(SALT_WORK_FACTOR, (err, salt) => {
@@ -43,7 +43,7 @@ user.pre('save', function (next) {
   });
 });
 
-Object.assign(user.methods, {
+Object.assign(User.methods, {
   getFullName() {
     return `${this.name} ${this.surname}`;
   },
@@ -53,4 +53,10 @@ Object.assign(user.methods, {
   }
 });
 
-module.exports = mongoose.model('User', user);
+Object.assign(User.statics, {
+  isAdmin(user) {
+    return user && user.role === Role.Admin;
+  }
+});
+
+module.exports = mongoose.model('User', User);

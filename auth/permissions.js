@@ -1,20 +1,28 @@
 const HTTPStatus = require('http-status');
+const User = require('../models/user');
 
 function isAdmin(req, res, next) {
-  if (req.user && req.user.role === 'Admin') {
+  if (User.isAdmin(req.user)) {
     next();
     return;
   }
-  res.status(HTTPStatus.FORBIDDEN).json();
+  const data = {
+    success: false,
+    error: 'Not allowed!'
+  };
+  res.status(HTTPStatus.FORBIDDEN).json(data);
 }
 
-function isUser(req, res, next) {
-  if (req.user.role === 'User') {
+function isLoggedIn(req, res, next) {
+  if (req.user) {
     next();
     return;
   }
-  res.status(HTTPStatus.FORBIDDEN).json();
+  const data = {
+    success: false,
+    error: 'Not authorized!'
+  };
+  res.status(HTTPStatus.UNAUTHORIZED).json(data);
 }
 
-module.exports = { isAdmin, isUser };
-
+module.exports = { isAdmin, isLoggedIn };

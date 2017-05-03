@@ -5,7 +5,7 @@ const { Schema } = mongoose;
 const { ObjectId } = Schema;
 
 const quoteCollection = new Schema({
-  owner: ObjectId, //make owner_name attr, pull from the id of owner
+  owner: ObjectId,
   title: String,
   description: String,
   category: String,
@@ -29,7 +29,7 @@ Object.assign(quoteCollection.methods, {
 
   getQuotes() {
     const Quote = mongoose.model('Quote');
-    return Promise.all(this.quote_id.map(id => Quote.findById(id)));
+    return Promise.all(this.quotes.map(id => Quote.findById(id)));
   },
 
   addCollaborators(collaborator_ids) {
