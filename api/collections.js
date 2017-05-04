@@ -3,6 +3,9 @@
 const HTTPStatus = require('http-status');
 const router = require('express').Router();
 const QuoteCollection = require('../models/quoteCollection');
+const { isLoggedIn } = require('../auth/permissions');
+
+router.use(isLoggedIn);
 
 router.get('/collections', listQuoteCollections);
 router.post('/collections', createQuoteCollection);

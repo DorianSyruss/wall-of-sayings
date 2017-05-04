@@ -3,13 +3,13 @@
 const HTTPStatus = require('http-status');
 const router = require('express').Router();
 const User = require('../models/user');
-const { isAdmin, isLoggedIn } = require('../auth/permissions');
+const { isAdmin } = require('../auth/permissions');
 
 router.get('/users', isAdmin, listUsers);
-router.post('/users', createUser);
-router.get('/users/:id', isLoggedIn, getUser);
-router.put('/users/:id', isLoggedIn, updateUser);
-router.delete('/users/:id', isLoggedIn, deleteUser);
+router.post('/register', createUser);
+router.get('/users/:id', getUser);
+router.put('/users/:id', updateUser);
+router.delete('/users/:id', deleteUser);
 
 module.exports = router;
 
@@ -19,14 +19,14 @@ function listUsers(req, res, next){
     .catch(err => next(err));
 }
 
-function getUser(req, res, next) {
-  User.findById(req.params.id)
+function createUser(req, res, next) {
+  User.create(req.body)
     .then(user => res.status(HTTPStatus.OK).send(user))
     .catch(err => next(err));
 }
 
-function createUser(req, res, next) {
-  User.create(req.body)
+function getUser(req, res, next) {
+  User.findById(req.params.id)
     .then(user => res.status(HTTPStatus.OK).send(user))
     .catch(err => next(err));
 }
