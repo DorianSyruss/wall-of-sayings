@@ -16,4 +16,3 @@ Object.assign(quote.methods, {
 });
 
 module.exports = mongoose.model('Quote', quote);
-
