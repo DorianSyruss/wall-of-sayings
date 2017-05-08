@@ -1,0 +1,27 @@
+[
+  {
+    "title": "collection1",
+    "description": "great collection 1",
+    "category": "science"
+  },
+  {
+    "title": "collection2",
+    "description": "great collection 2",
+    "category": "life"
+  },
+  {
+    "title": "collection3",
+    "description": "great collection 3",
+    "category": "philosophy"
+  },
+  {
+    "title": "collection4",
+    "description": "great collection 4",
+    "category": "cultural"
+  },
+  {
+    "title": "collection5",
+    "description": "great collection 5",
+    "category": "inspiring"
+  }
+]

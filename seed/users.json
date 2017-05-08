@@ -1,0 +1,34 @@
+[
+  {
+    "name": "ante1",
+    "username": "antic1",
+    "gender": "male",
+    "email": "mali@ante1.com",
+    "password": "jedan"
+  },
+  {
+    "name": "ante2",
+    "username": "antic2",
+    "gender": "male",
+    "email": "mali@ante2.com",
+    "password": "dva"
+  },
+  {
+    "name": "ante3",
+    "username": "antic3",
+    "email": "mali@ante3.com",
+    "password": "tri"
+  },
+  {
+    "name": "ante4",
+    "username": "antic4",
+    "email": "mali@ante4.com",
+    "password": "cetiri"
+  },
+  {
+    "name": "ante5",
+    "username": "antic5",
+    "email": "mali@ante5.com",
+    "password": "pet"
+  }
+]
