@@ -6,9 +6,9 @@ const times = require('lodash/times');
 const uniqBy = require('lodash/uniqBy');
 
 // models
-const User = require('../models/user');
-const Quote = require('../models/quote');
-const QuoteCollection = require('../models/quoteCollection');
+const User = require('../server/models/user');
+const Quote = require('../server/models/quote');
+const QuoteCollection = require('../server/models/quoteCollection');
 
 // seed data
 const users = require('../seed/users.json');

@@ -1,7 +1,7 @@
 'use strict';
 
 require('dotenv').config();
-const passport = require('./auth');
+const passport = require('./server/auth');
 const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
@@ -11,6 +11,8 @@ const app = express();
 
 db.on('error', e => console.error('connection error:', e));
 db.once('open', () => console.log('connection established', dbUri));
+
+app.use(express.static('public'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -26,7 +28,7 @@ app.use(passport.session());
 app.use(express.static(__dirname + '/public'));
 
 // add api routes
-require('./api')(app);
+require('./server/api')(app);
 
 // global error handler
 app.use((err, req, res, next) => {
