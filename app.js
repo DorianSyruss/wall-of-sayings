@@ -4,6 +4,7 @@ require('dotenv').config();
 const passport = require('./server/auth');
 const express = require('express');
 const session = require('express-session');
+const path = require('path');
 const bodyParser = require('body-parser');
 const HTTPStatus = require('http-status');
 const { db, dbUri } = require('./db');
@@ -25,7 +26,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(express.static(__dirname + '/public'));
+app.use('/', express.static(path.join(__dirname, './dist')));
 
 // add api routes
 require('./server/api')(app);

@@ -1,5 +1,6 @@
 'use strict';
 
+const { parse } = require('url');
 const auth = require('./auth');
 const users = require('./users');
 const quotes = require('./quotes');
@@ -17,6 +18,12 @@ const publicRoutes = [{
   path: '/api/auth/logout',
   method: 'GET'
 }, {
+  path: '/api/auth/facebook/callback',
+  method: 'GET'
+}, {
+  path: '/api/auth/facebook',
+  method: 'GET'
+}, {
   path: '/api/users',
   method: 'POST'
 }, {
@@ -27,7 +34,8 @@ const publicRoutes = [{
 const isPublicRoute = route => contains(publicRoutes, route);
 
 function checkAccessRights(req, res, next) {
-  let routeDesc = { path: req.originalUrl, method: req.method };
+  let { pathname } = parse(req.originalUrl);
+  let routeDesc = { path: pathname, method: req.method };
   if (isPublicRoute(routeDesc)) {
     next();
     return;
