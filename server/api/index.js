@@ -27,6 +27,9 @@ const publicRoutes = [{
   path: '/api/users',
   method: 'POST'
 }, {
+  path: '/api/register',
+  method: 'POST'
+}, {
   path: '/api/quotes',
   method: 'GET'
 }];

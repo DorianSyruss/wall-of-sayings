@@ -1,17 +1,17 @@
 <template>
-  <div class="container">
-    <form @submit.prevent="handleLogin">
-      <div class="form-group">
-        <label for="login-email">Email address</label>
-        <input name="email"  type="email" class="form-control" id="login-email" placeholder="Email" v-model="username">
-      </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input name="password" type="password" class="form-control" id="password-input" placeholder="Password" v-model="password">
-      </div>
-      <button type="submit" class="btn btn-default">Login</button>
-    </form>
-  </div>
+    <div class="login-form">
+      <form @submit.prevent="handleLogin">
+        <div class="form-group">
+          <label>Email address</label>
+          <input name="email"  type="email" class="form-control" placeholder="Email" v-model="username">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input name="password" type="password" class="form-control"placeholder="Password" v-model="password">
+        </div>
+        <button type="submit" class="btn btn-default">Login</button>
+      </form>
+    </div>
 </template>
 
 <script>
@@ -40,3 +40,10 @@
     }
   };
 </script>
+
+<style lang="scss">
+  .login-form {
+    padding: 10px 15px 12px 15px;
+    margin: 0 0 10px 0;
+  }
+</style>

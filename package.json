@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node app.js",
+    "server": "nodemon app.js",
+    "client": "webpack-dev-server --env=dev",
     "dev": "nodemon app.js & webpack-dev-server --env=dev",
     "seed": "node scripts/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -53,6 +55,7 @@
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.1",
     "passport-local": "^1.0.0",
-    "vue": "^2.3.3"
+    "vue": "^2.3.3",
+    "vue-resource": "^1.3.1"
   }
 }
