@@ -68,7 +68,7 @@ let baseConfig = {
       template: path.join(__dirname, 'client/index.html'),
       inject: true
     })
-  ]
+  ],
 };
 
 module.exports = env => {
@@ -76,6 +76,7 @@ module.exports = env => {
   if (env === 'dev') {
     config.devtool = 'eval';
     config.devServer = {
+      disableHostCheck: true,
       contentBase: path.join(__dirname, 'dist'),
       port: 9090,
       proxy: {
