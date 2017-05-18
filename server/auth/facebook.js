@@ -14,16 +14,16 @@ const auth = new FacebookStrategy({
 module.exports = auth;
 
 function authorize(accessToken, refreshToken, profile, done) {
-  let facebookId = profile.id;
+  let facebook_id = profile.id;
   let email = getProp(profile, 'emails[0].value');
 
-  let query = { facebookId } || { email };
+  let query = { email } || { facebook_id };
   User.findOne(query, (err, user) => {
     if (err) return done(err);
     if (user) return done(null, user);
 
     User.create({
-      facebookId: profile.id,
+      facebook_id: profile.id,
       email: profile.emails[0].value,
       name: profile.displayName,
       gender: profile.gender
