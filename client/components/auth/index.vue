@@ -1,8 +1,8 @@
 <template>
   <div class="auth-form">
     <div class="auth-menu">
-      <a href="#" class="log-button btn btn-default" @click="isSelected = true" :class="{ disabled: isSelected }">Login</a>
-      <a href="#" class="reg-button btn btn-default" @click="isSelected = false" :class="{ disabled: !isSelected }">Register</a>
+      <a href="#" class="log-button btn btn-primary" @click="isSelected = true" :class="{ disabled: isSelected }">Login</a>
+      <a href="#" class="reg-button btn btn-primary" @click="isSelected = false" :class="{ disabled: !isSelected }">Register</a>
     </div>
     <login v-if="isSelected"></login>
     <register v-else></register>
@@ -32,10 +32,11 @@
 <style lang="scss" scoped>
   .auth-form {
     max-width: 320px;
-    margin-bottom: 15px;
+    margin: 10px 0 0 10px;
+    box-shadow: 0px 1px 6px 1px;
 
     .auth-menu{
-      background: #95a5a6;
+      background: #2C3E50;
     }
 
     .log-button {

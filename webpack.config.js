@@ -19,6 +19,12 @@ let baseConfig = {
     filename: 'bundle.js',
     path: path.join(__dirname, 'dist')
   },
+  resolve: {
+    alias: {
+      style: path.join(__dirname, './client/style'),
+      components: path.join(__dirname, './client/components')
+    }
+  },
   module: {
     rules: [{
       test: /\.js$/,

@@ -5,19 +5,19 @@
           <input v-validate="'required|email'"
                  name="email"
                  type="email"
-                 class="form-control reg-email"
+                 class="form-control input-sm"
                  placeholder="Email"
                  v-model="username">
-          <span v-show="errors.has('email')">{{ errors.first('email') }}</span>
+          <span v-show="errors.has('email')" class="label err-label">{{ errors.first('email') }}</span>
         </div>
         <div class="form-group">
           <input v-validate="'required'"
                  name="password"
                  type="password"
-                 class="form-control reg-password"
+                 class="form-control input-sm"
                  placeholder="Password"
                  v-model="password">
-          <span v-show="errors.has('password')">{{ errors.first('password') }}</span>
+          <span v-show="errors.has('password')" class="label err-label">{{ errors.first('password') }}</span>
         </div>
         <button type="submit" class="btn btn-default">Login</button>
       </form>

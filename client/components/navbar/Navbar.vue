@@ -19,6 +19,8 @@
           <button type="submit" class="btn btn-default">Submit</button>
         </form>
         <ul class="nav navbar-nav navbar-right">
+          <li><a href="#">Home</a></li>
+          <li><a href="#">About</a></li>
           <li><a href="#">Profile</a></li>
         </ul>
       </div>
