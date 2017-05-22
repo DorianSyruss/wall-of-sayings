@@ -29,12 +29,15 @@
 </template>
 
 <script>
-  export default {}
+  export default {};
 </script>
 
-<style>
+<style lang="scss" scoped>
+  @import '../../style/constants';
+
   .navbar {
     margin-bottom: 0;
     border-radius: 0;
+    @include box-shadow($shadow-color-dark);
   }
 </style>

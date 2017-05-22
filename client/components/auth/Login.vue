@@ -19,6 +19,7 @@
                  v-model="password">
           <span v-show="errors.has('password')" class="label err-label">{{ errors.first('password') }}</span>
         </div>
+        <span v-if="errMsg" class="error label label-warning">{{ errMsg }}</span>
         <button type="submit" class="btn btn-default">Login</button>
       </form>
     </div>
@@ -30,6 +31,7 @@
       return {
         username: '',
         password: '',
+        errMsg: '',
         user: {}
       };
     },
@@ -44,8 +46,9 @@
             .then(({ body: user }) => {
               this.user = user;
               console.log(user);
-            }, (response) => {
-              console.log(response);
+            }, response => {
+              this.errMsg = 'Wrong email or password! Try again!';
+              console.log('Login failed');
           });
         });
       }

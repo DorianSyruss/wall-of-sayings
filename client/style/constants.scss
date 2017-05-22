@@ -1,1 +1,9 @@
+$err-msg-color: #E74C3C;
+$info-msg-color: #F39C12;
+$theme-color-dark: #2C3E50;
+$shadow-color-light: #b7c1c1;
+$shadow-color-dark: #778899;
 
+@mixin box-shadow ($color) {
+  box-shadow: 0 1px 6px 1px $color;
+}

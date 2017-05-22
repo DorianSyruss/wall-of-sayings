@@ -1,3 +1,11 @@
+@import './constants.scss';
+
 .err-label {
-  color: #E74C3C;
+  color: $err-msg-color;
+}
+
+.error {
+  margin-bottom: 10px;
+  display: block;
+  padding: 20px;
 }

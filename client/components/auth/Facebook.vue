@@ -13,6 +13,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @import '../../style/constants';
+
   .fb-sign-btn {
     border-radius: 0;
   }

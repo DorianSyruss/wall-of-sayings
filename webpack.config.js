@@ -74,7 +74,7 @@ let baseConfig = {
       template: path.join(__dirname, 'client/index.html'),
       inject: true
     })
-  ],
+  ]
 };
 
 module.exports = env => {

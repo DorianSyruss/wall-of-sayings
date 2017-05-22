@@ -13,7 +13,7 @@
 <script>
   import Login from './Login.vue';
   import Register from './Register.vue';
-  import Facebook from './Facebook.vue'
+  import Facebook from './Facebook.vue';
 
   export default {
     data() {
@@ -26,17 +26,19 @@
       Register,
       Facebook
     }
-  }
+  };
 </script>
 
 <style lang="scss" scoped>
+  @import '../../style/constants';
+
   .auth-form {
     max-width: 320px;
     margin: 10px 0 0 10px;
-    box-shadow: 0px 1px 6px 1px;
+    @include box-shadow($shadow-color-light);
 
-    .auth-menu{
-      background: #2C3E50;
+    .auth-menu {
+      background: $theme-color-dark;
     }
 
     .log-button {

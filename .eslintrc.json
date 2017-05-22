@@ -1,10 +1,12 @@
 {
   "extends": "eslint:recommended",
+  "plugins": ["vue"],
   "parserOptions": {
     "ecmaVersion": 6,
     "sourceType": "module"
   },
   "rules": {
+    "vue/jsx-uses-vars": 2,
     "quotes": ["error", "single"],
     "semi": ["error", "always"],
 
