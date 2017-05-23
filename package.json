@@ -10,7 +10,7 @@
     "dev": "nodemon app.js & webpack-dev-server --env=dev",
     "seed": "node scripts/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "fbclient": "lt -p 9090 --subdomain wall",
+    "fbclient": "lt -p 9090 --subdomain wall"
   },
   "author": "DorianSyruss",
   "license": "ISC",

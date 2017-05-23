@@ -33,8 +33,8 @@
   @import '../../style/constants';
 
   .auth-form {
-    max-width: 320px;
-    margin: 10px 0 0 10px;
+    margin: 15px;
+    max-width: 310px;
     @include box-shadow($shadow-color-light);
 
     .auth-menu {

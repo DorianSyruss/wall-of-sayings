@@ -67,7 +67,7 @@ let baseConfig = {
     }]
   },
   plugins: [
-    new CopyWebpackPlugin([{ from: 'assets', to: 'dist/assets' }]),
+    new CopyWebpackPlugin([{ from: 'assets', to: 'assets' }]),
     new ExtractTextPlugin('style.css'),
     new HtmlWebpackPlugin({
       filename: path.join(__dirname, 'dist/index.html'),
