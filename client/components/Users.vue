@@ -7,8 +7,8 @@
         </div>
       </div>
     </div>
-    <div class="input-group-sm">
-      <input type="text" class="form-control" placeholder="Search Users">
+    <div class="search-users input-group-sm">
+      <input type="text" class="form-control" placeholder="Search users ...">
     </div>
     <div class="profiles table">
       <table class="table user-list">
@@ -24,9 +24,9 @@
               <img class="img-circle"
                :src="user.image"
                alt="User Pic">
-              <a class="user-link">{{ user.name }}</a>
+              <a href="#" class="user-link">{{ user.name }}</a>
             </td>
-            <td>
+            <td class="align-center">
               {{ user.role }}
             </td>
           </tr>
@@ -42,23 +42,23 @@
       return {
         users: [{
           name: 'Mali Ante',
-          image: 'assets/profile/profile.png',
+          image:'assets/profile/profile.png',
+          role: 'Admin'
+        }, {
+          name: 'Mali Ante',
+          image:'assets/profile/profile.png',
+          role: 'User'
+        }, {
+          name: 'Mali Ivan',
+          image:'assets/profile/profile.png',
+          role: 'Moderator'
+        }, {
+          name: 'Mali Ante',
+          image:'assets/profile/profile.png',
           role: 'User'
         }, {
           name: 'Mali Ante',
-          image: 'assets/profile/profile.png',
-          role: 'User'
-        }, {
-          name: 'Mali Ante',
-          image: 'assets/profile/profile.png',
-          role: 'User'
-        }, {
-          name: 'Mali Ante',
-          image: 'assets/profile/profile.png',
-          role: 'User'
-        }, {
-          name: 'Mali Ante',
-          image: 'assets/profile/profile.png',
+          image:'assets/profile/profile.png',
           role: 'User'
         }]
       };
@@ -67,17 +67,36 @@
 </script>
 
 <style lang="scss" scoped>
+  @import '../style/constants';
+
   .users {
     margin: 15px;
     width: 310px;
     height: 500px;
 
+    .search-users {
+      margin-bottom: 10px;
+    }
+
     .profiles {
-      td {
-        vertical-align: middle;
+      thead {
+        background: #18BC9C;
+
+        th {
+          text-align: center;
+        }
       }
-      img {
-        width: 40px;
+
+      tbody {
+        border-bottom: 1px solid $theme-color-light;
+
+        td {
+          vertical-align: middle;
+        }
+
+        img {
+          width: 40px;
+        }
       }
     }
   }

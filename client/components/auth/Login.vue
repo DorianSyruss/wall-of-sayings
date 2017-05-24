@@ -59,6 +59,5 @@
 <style lang="scss" scoped>
   .login-form {
     padding: 10px 15px 12px 15px;
-    margin: 0 0 10px 0;
   }
 </style>

@@ -1,7 +1,20 @@
 @import './constants.scss';
 
+.clearfix:after {
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: " ";
+  clear: both;
+  height: 0;
+}
+
 .err-label {
   color: $err-msg-color;
+}
+
+.align-center {
+  text-align: center;
 }
 
 .error {

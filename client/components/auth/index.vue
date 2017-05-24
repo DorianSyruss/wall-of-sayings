@@ -34,7 +34,7 @@
 
   .auth-form {
     margin: 15px;
-    max-width: 310px;
+    width: 310px;
     @include box-shadow($shadow-color-light);
 
     .auth-menu {
