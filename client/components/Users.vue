@@ -70,8 +70,6 @@
   @import '../style/constants';
 
   .users {
-    margin: 15px;
-    width: 310px;
     height: 500px;
 
     .search-users {

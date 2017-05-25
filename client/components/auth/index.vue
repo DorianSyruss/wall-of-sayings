@@ -1,8 +1,10 @@
 <template>
   <div class="auth-form">
-    <div class="auth-menu">
-      <a href="#" class="log-button btn btn-primary" @click="isSelected = true" :class="{ disabled: isSelected }">Login</a>
-      <a href="#" class="reg-button btn btn-primary" @click="isSelected = false" :class="{ disabled: !isSelected }">Register</a>
+    <div class="container-fluid">
+      <div class="auth-menu row">
+        <a href="#" class="log-button btn btn-primary col-sm-6" @click="isSelected = true" :class="{ disabled: isSelected }">Login</a>
+        <a href="#" class="reg-button btn btn-primary col-sm-6" @click="isSelected = false" :class="{ disabled: !isSelected }">Register</a>
+      </div>
     </div>
     <login v-if="isSelected"></login>
     <register v-else></register>
@@ -33,19 +35,15 @@
   @import '../../style/constants';
 
   .auth-form {
-    margin: 15px;
-    width: 310px;
+    margin-top: 15px;
+    margin-bottom: 20px;
     @include box-shadow($shadow-color-light);
 
     .auth-menu {
       background: $theme-color-dark;
-    }
-
-    .log-button {
-      width:49%;
-    }
-    .reg-button {
-      width: 50%;
+      a {
+        border-radius: 0;
+      }
     }
   }
 </style>

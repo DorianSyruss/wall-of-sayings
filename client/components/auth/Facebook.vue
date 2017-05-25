@@ -9,7 +9,7 @@
         window.open('api/auth/facebook', "signUp", "width=600, height=800");
       }
     }
-  }
+  };
 </script>
 
 <style lang="scss" scoped>

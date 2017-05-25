@@ -1,18 +1,18 @@
 <template>
-  <div class="row">
     <div class="categories col-sm-12">
-      <div class="col-sm-4" v-for="categorie in categories">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h3 class="panel-title">{{ categorie.title }}</h3>
-          </div>
-          <div class="panel-body">
-            {{ categorie.description }}
+      <div class="row">
+        <div class="col-md-6 col-md-10 col-lg-6" v-for="categorie in categories">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">{{ categorie.title }}</h3>
+            </div>
+            <div class="panel-body">
+              {{ categorie.description }}
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -42,7 +42,7 @@
 
 <style lang="scss" scoped>
   .categories {
-    margin-top: 40px;
+    margin-top: 15px;
   }
 
   .panel {

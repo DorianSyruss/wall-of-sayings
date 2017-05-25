@@ -1,21 +1,29 @@
 <template>
-  <div class="page-wrapper">
+  <div>
     <navbar></navbar>
-    <div class="content-left">
-      <auth-form></auth-form>
-      <users></users>
-    </div>
-    <div class="content-center col-sm-8">
-      <div class="top-content col-sm-12">
-        <div class="content-title">
-          <h2>{{ title }}</h2>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="content-left col-md-2 col-lg-3">
+          <auth-form></auth-form>
+          <users></users>
         </div>
-        <div class="description">
-          <p>{{ description }}</p>
+        <div class="content-center col-sm-6 col-md-6 col-lg-6">
+          <div class="top-content col-sm-12">
+            <div class="content-title">
+              <h2>{{ title }}</h2>
+            </div>
+            <div class="description">
+              <p>{{ description }}</p>
+            </div>
+          </div>
+          <categories></categories>
+          <quotes></quotes>
+        </div>
+        <div class="content-right col-lg-3">
+          <proposed></proposed>
+          <latest></latest>
         </div>
       </div>
-      <categories></categories>
-      <quotes></quotes>
     </div>
   </div>
 </template>
@@ -26,6 +34,8 @@
   import Users from 'components/Users.vue';
   import Quotes from 'components/Quotes.vue';
   import Categories from 'components/Categories.vue';
+  import Proposed from 'components/Quotes/Proposed.vue';
+  import Latest from 'components/Quotes/Latest.vue';
 
   export default {
     data() {
@@ -39,13 +49,29 @@
       AuthForm,
       Users,
       Categories,
-      Quotes
+      Quotes,
+      Proposed,
+      Latest
     }
   };
 </script>
 
 <style lang="scss" scoped>
+  .container-fluid {
+    max-width: 1366px;
+  }
+
   .content-left {
     float: left;
+  }
+
+  .content-center {
+    .content-title h2 {
+      margin-top: 15px;
+    }
+  }
+
+  .content-right {
+    float: right;
   }
 </style>

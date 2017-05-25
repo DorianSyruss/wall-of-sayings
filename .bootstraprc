@@ -44,7 +44,7 @@ styles:
   # Reset and dependencies
   normalize: true
   print: false
-  glyphicons: false
+  glyphicons: true
 
   # Core CSS
   scaffolding: true
