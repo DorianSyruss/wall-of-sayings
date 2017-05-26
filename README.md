@@ -4,3 +4,4 @@ Full stack web app that allows users to register and save their favorite inspira
 
 - node/express/mongoose RESTful API
 - FB login supported, new acc creation supported
+- Vue.js framework
