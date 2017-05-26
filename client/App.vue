@@ -32,7 +32,7 @@
   import AuthForm from 'components/auth/index.vue';
   import Navbar from 'components/navbar/Navbar.vue';
   import Users from 'components/Users.vue';
-  import Quotes from 'components/Quotes.vue';
+  import Quotes from 'components/Quotes/Quotes.vue';
   import Categories from 'components/Categories.vue';
   import Proposed from 'components/Quotes/Proposed.vue';
   import Latest from 'components/Quotes/Latest.vue';
@@ -70,7 +70,6 @@
       margin-top: 15px;
     }
   }
-
   .content-right {
     float: right;
   }

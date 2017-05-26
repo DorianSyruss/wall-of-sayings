@@ -1,13 +1,13 @@
 <template>
     <div class="categories col-sm-12">
       <div class="row">
-        <div class="col-md-6 col-md-10 col-lg-6" v-for="categorie in categories">
+        <div class="col-md-10 col-lg-6" v-for="category in categories">
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title">{{ categorie.title }}</h3>
+              <h3 class="panel-title">{{ category.title }}</h3>
             </div>
             <div class="panel-body">
-              {{ categorie.description }}
+              {{ category.description }}
             </div>
           </div>
         </div>

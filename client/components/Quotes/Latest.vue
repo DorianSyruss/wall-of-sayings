@@ -2,22 +2,15 @@
   <div class="latest-quotes">
     <div class="title">
       <h2>Latest quotes</h2>
-      <p class="descrioption">
-        Check out the latest quotes and sayings added to the quote library.
-      </p>
+      <div class="description">
+        <p>Check out the latest quotes and sayings added to the quote library.</p>
+      </div>
     </div>
-    <div class="list-group">
-      <a href="#" class="list-group-item">
-        <h5 class="list-group-item-text">{{ quote }}</h5>
-        <p class="list-group-item-heading">{{ author }}</p>
-      </a>
-      <a href="#" class="list-group-item">
-        <h5 class="list-group-item-heading">{{ quote }}</h5>
-        <p class="list-group-item-text">{{ author }}</p>
-      </a>
+    <div class="quote">
+      <p>{{ quote }}</p>
+      <p class="author">--- {{ author }}</p>
     </div>
   </div>
-
 </template>
 
 <script>
@@ -33,12 +26,13 @@
 
 <style lang="scss" scoped>
   .latest-quotes {
-    .list-group-item {
-      p {
-        font-size: 13px;
-        font-style: italic;
-      }
+    p {
+      font-size: 14px;
+      font-style: italic;
+    }
+    .author {
+      font-size: 12px;
+      text-indent: 10px;
     }
   }
-
 </style>

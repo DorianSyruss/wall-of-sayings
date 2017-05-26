@@ -1,7 +1,9 @@
 <template>
   <div class="proposed-quotes">
     <h2>Quote vote</h2>
-    <p>Vote for the quote you wish to see published! These quotes can be proposed by you or your friends!</p>
+    <div class="description">
+      <p>Vote for the quote you wish to see published! These quotes can be proposed by you or your friends!</p>
+    </div>
     <blockquote>
       <span class="glyphicon glyphicon-chevron-left"></span>
       <span class="glyphicon glyphicon-chevron-right"></span>
@@ -29,7 +31,7 @@
 <style lang="scss" scoped>
   .proposed-quotes {
     padding-bottom: 30px;
-    border-bottom: 1px dashed black;
+    border-bottom: 1px solid black;
   }
   .vote {
     text-align: center;
@@ -39,5 +41,4 @@
       border-left: 5px solid orange;
     }
   }
-
 </style>
