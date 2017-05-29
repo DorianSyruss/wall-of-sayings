@@ -5,23 +5,17 @@
       <div class="row">
         <div class="content-left col-md-2 col-lg-3">
           <auth-form></auth-form>
+          <collections></collections>
           <users></users>
         </div>
         <div class="content-center col-sm-6 col-md-6 col-lg-6">
-          <div class="top-content col-sm-12">
-            <div class="content-title">
-              <h2>{{ title }}</h2>
-            </div>
-            <div class="description">
-              <p>{{ description }}</p>
-            </div>
-          </div>
-          <categories></categories>
-          <quotes></quotes>
+          <quotes v-if="activeCategory" @clearCategory="clearCategory" :category="activeCategory"></quotes>
+          <categories v-else @categorySelected="toggleCategory"></categories>
         </div>
         <div class="content-right col-lg-3">
           <proposed></proposed>
           <latest></latest>
+          <popular></popular>
         </div>
       </div>
     </div>
@@ -36,22 +30,33 @@
   import Categories from 'components/Categories.vue';
   import Proposed from 'components/Quotes/Proposed.vue';
   import Latest from 'components/Quotes/Latest.vue';
+  import Popular from 'components/Quotes/Popular.vue';
+  import Collections from 'components/Collections.vue';
 
   export default {
     data() {
       return {
-        title: 'Quotes and Sayings',
-        description: 'This is some description'
+        activeCategory: ''
       };
+    },
+    methods: {
+      toggleCategory(category) {
+        this.activeCategory = category;
+      },
+      clearCategory() {
+        this.activeCategory = '';
+      }
     },
     components: {
       Navbar,
       AuthForm,
       Users,
       Categories,
+      Collections,
       Quotes,
       Proposed,
-      Latest
+      Latest,
+      Popular
     }
   };
 </script>

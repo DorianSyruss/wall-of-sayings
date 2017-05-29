@@ -37,30 +37,32 @@
 </template>
 
 <script>
+  const users = [{
+      name: 'Mali Ante',
+      image:'assets/profile/profile.png',
+      role: 'Admin'
+    }, {
+      name: 'Mali Ante',
+      image:'assets/profile/profile.png',
+      role: 'User'
+    }, {
+      name: 'Mali Ivan',
+      image:'assets/profile/profile.png',
+      role: 'Moderator'
+    }, {
+      name: 'Mali Ante',
+      image:'assets/profile/profile.png',
+      role: 'User'
+    }, {
+      name: 'Mali Ante',
+      image:'assets/profile/profile.png',
+      role: 'User'
+    }];
+
   export default {
     data() {
       return {
-        users: [{
-          name: 'Mali Ante',
-          image:'assets/profile/profile.png',
-          role: 'Admin'
-        }, {
-          name: 'Mali Ante',
-          image:'assets/profile/profile.png',
-          role: 'User'
-        }, {
-          name: 'Mali Ivan',
-          image:'assets/profile/profile.png',
-          role: 'Moderator'
-        }, {
-          name: 'Mali Ante',
-          image:'assets/profile/profile.png',
-          role: 'User'
-        }, {
-          name: 'Mali Ante',
-          image:'assets/profile/profile.png',
-          role: 'User'
-        }]
+        users
       };
     }
   };

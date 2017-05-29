@@ -13,6 +13,36 @@
   color: $err-msg-color;
 }
 
+.quote-preview {
+  padding: 5px;
+  border-bottom: 1px solid black;
+  p {
+    font-size: 14px;
+    font-style: italic;
+    margin-bottom: 2px;
+  }
+  .author {
+    font-size: 12px;
+    text-indent: 10px;
+  }
+}
+
+.quote {
+  border: 1px dotted $shadow-color-light;
+  p {
+    font-size: 20px;
+    font-style: italic;
+    margin-bottom: 2px;
+    text-align: center;
+    font-weight: 100;
+  }
+  .author {
+    font-size: 16px;
+    text-align: left;
+    padding-left: 15px;
+  }
+}
+
 .align-center {
   text-align: center;
 }
@@ -25,5 +55,6 @@
 
 .description {
   border-bottom: 1px solid black;
-  margin-bottom: 10px;
+  margin-bottom: 30px;
+  margin-top: 10px;
 }

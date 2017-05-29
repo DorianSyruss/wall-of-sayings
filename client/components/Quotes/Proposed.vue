@@ -1,6 +1,8 @@
 <template>
   <div class="proposed-quotes">
-    <h2>Quote vote</h2>
+    <div class="title">
+      <h2>Quote vote</h2>
+    </div>
     <div class="description">
       <p>Vote for the quote you wish to see published! These quotes can be proposed by you or your friends!</p>
     </div>
@@ -31,7 +33,13 @@
 <style lang="scss" scoped>
   .proposed-quotes {
     padding-bottom: 30px;
-    border-bottom: 1px solid black;
+
+    .title h2 {
+      margin-top: 15px;
+      background: #18BC9C;
+      padding: 5px;
+      font-size: 24px;
+    }
   }
   .vote {
     text-align: center;
