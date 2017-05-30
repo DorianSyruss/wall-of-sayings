@@ -1,5 +1,5 @@
 <template>
-    <a href="#" class="fb-sign-btn btn btn-default btn-medium btn-block" @click="handleSignUp">Sign up with Facebook</a>
+  <a href="#" class="fb-sign-btn btn btn-default btn-medium btn-block" @click="handleSignUp">Sign up with Facebook</a>
 </template>
 
 <script>

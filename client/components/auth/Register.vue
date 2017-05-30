@@ -98,7 +98,7 @@
           this.$http.post('api/register', newUser)
             .then(() => {
               console.log('User Created');
-            }, response => {
+            }, () => {
               this.errMsg = 'User with this email already exists!';
               console.log('Error creating user');
             });

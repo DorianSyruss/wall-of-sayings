@@ -4,8 +4,8 @@
     <div class="container-fluid">
       <div class="row">
         <div class="content-left col-md-2 col-lg-3">
-          <auth-form></auth-form>
-          <collections></collections>
+          <auth-form @login="onLogin" v-if="!user.id"></auth-form>
+          <collections v-else></collections>
           <users></users>
         </div>
         <div class="content-center col-sm-6 col-md-6 col-lg-6">
@@ -36,7 +36,8 @@
   export default {
     data() {
       return {
-        activeCategory: ''
+        activeCategory: '',
+        user: {}
       };
     },
     methods: {
@@ -45,6 +46,10 @@
       },
       clearCategory() {
         this.activeCategory = '';
+      },
+      onLogin(user) {
+        console.log('login');
+        this.user = user;
       }
     },
     components: {

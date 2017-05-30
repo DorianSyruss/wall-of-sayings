@@ -6,7 +6,7 @@
         <a href="#" class="reg-button btn btn-primary col-sm-6" @click="isSelected = false" :class="{ disabled: !isSelected }">Register</a>
       </div>
     </div>
-    <login v-if="isSelected"></login>
+    <login @login="onLogin" v-if="isSelected"></login>
     <register v-else></register>
     <facebook></facebook>
   </div>
@@ -22,6 +22,11 @@
       return {
         isSelected: true
       };
+    },
+    methods: {
+      onLogin(user) {
+        this.$emit('login', user);
+      }
     },
     components: {
       Login,

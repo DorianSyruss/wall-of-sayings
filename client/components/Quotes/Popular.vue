@@ -18,7 +18,7 @@
     data() {
       return {
         quoteList: [{
-          quote: 'This is a quote that has been saved to user collections a lot of time.',
+          quote: 'This is a quote that has been saved to user collections a lot of times.',
           author: 'Somebody Someone'
         }]
       };
@@ -28,6 +28,7 @@
 
 <style lang="scss" scoped>
   .popular-quotes {
+
     .description {
       margin-bottom: 0;
     }
@@ -39,5 +40,4 @@
       font-size: 24px;
     }
   }
-
 </style>

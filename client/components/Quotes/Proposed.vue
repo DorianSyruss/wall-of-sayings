@@ -45,6 +45,7 @@
     text-align: center;
   }
   .proposed-quotes {
+
     blockquote {
       border-left: 5px solid orange;
     }

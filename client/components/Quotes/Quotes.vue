@@ -57,7 +57,7 @@
     background: #477b9c;
 
     .quote {
-      margin-bottom: 20px;
+      margin-bottom: 5px;
       background: white;
     }
   }
