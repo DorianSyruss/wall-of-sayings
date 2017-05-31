@@ -6,7 +6,7 @@
   export default {
     methods: {
       handleSignUp() {
-        window.open('api/auth/facebook', "signUp", "width=600, height=800");
+        window.open('api/auth/facebook', 'signUp', "width=600, height=800");
       }
     }
   };

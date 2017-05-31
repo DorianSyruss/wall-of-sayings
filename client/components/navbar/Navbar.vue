@@ -22,6 +22,7 @@
           <li><a href="#">Home</a></li>
           <li><a href="#">About</a></li>
           <li><a href="#">Profile</a></li>
+          <li v-if="user.id" @click="logout"><a href="#">Logout</a></li>
         </ul>
       </div>
     </div>
@@ -29,7 +30,14 @@
 </template>
 
 <script>
-  export default {};
+  export default {
+    props: ['user'],
+    methods: {
+      logout() {
+        this.$emit('logout');
+      }
+    }
+  };
 </script>
 
 <style lang="scss" scoped>

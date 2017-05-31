@@ -1,6 +1,6 @@
 <template>
   <div>
-    <navbar></navbar>
+    <navbar @logout="handleLogout" :user="user"></navbar>
     <div class="container-fluid">
       <div class="row">
         <div class="content-left col-md-2 col-lg-3">
@@ -50,6 +50,9 @@
       onLogin(user) {
         console.log('login');
         this.user = user;
+      },
+      handleLogout() {
+        this.user = {};
       }
     },
     components: {

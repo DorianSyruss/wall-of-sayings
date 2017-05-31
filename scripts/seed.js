@@ -4,6 +4,7 @@ require('dotenv').config();
 const random = require('lodash/random');
 const times = require('lodash/times');
 const uniqBy = require('lodash/uniqBy');
+const Promise = require('bluebird');
 
 // models
 const User = require('../server/models/user');
