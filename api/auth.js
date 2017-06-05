@@ -1,6 +1,6 @@
 'use strict';
 
-const passport = require('../auth/index');
+const passport = require('../auth');
 const router = require('express').Router();
 
 router.get('/auth/facebook', passport.authenticate('facebook', { scope: 'email' }));
@@ -11,9 +11,7 @@ router.post('/auth/login', passport.authenticate('local', { failureRedirect: '/a
   successRedirect:'/api/users' }));
 
 router.get('/auth/logout', (req, res) => {
-  req.session.destroy(() => {
-    res.redirect('/api/quotes');
-  });
+  req.session.destroy(() => res.redirect('/api/quotes'));
 });
 
 module.exports = router;

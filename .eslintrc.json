@@ -11,25 +11,13 @@
     "comma-spacing": ["error", { "before": false, "after": true }],
     "keyword-spacing": ["error", { "after": true, "before": true }],
 
-    /*    "space-in-brackets": ["error", "always", {
-          "singleValue": false,
-          "objectsInArrays": false,
-          "arraysInArrays": false,
-          "arraysInObjects": false,
-          "objectsInObjects": false,
-          "propertyName": true
-        }],*/
-
     "object-curly-spacing": ["error", "always"],
     "func-call-spacing": ["error", "never"],
     "space-in-parens": ["error", "never"],
 
-
-    // override default options for rules from base configurations
     "comma-dangle": ["error", "never"],
     "no-cond-assign": ["error", "always"],
 
-    // disable rules from base configurations
     "no-console": "off",
     "no-debugger": 0,
     "no-undef": "off"

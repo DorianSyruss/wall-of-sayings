@@ -2,6 +2,6 @@ node_modules/
 dist/
 .idea/
 .env.prod
-*.env
+.env
 *.log
 stats.json

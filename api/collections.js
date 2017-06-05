@@ -32,14 +32,13 @@ function getQuoteCollection(req, res, next) {
     .catch(err => next(err));
 }
 
-function createQuoteCollection(req, res, next){
-  let collection = Object.assign({}, req.body, { owner: req.query.owner });
-  QuoteCollection.create(collection)
+function createQuoteCollection(req, res, next) {
+  QuoteCollection.create(req.body)
     .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
     .catch(err => next(err));
 }
 
-function deleteQuoteCollection(req, res, next){
+function deleteQuoteCollection(req, res, next) {
   QuoteCollection.findByIdAndRemove(req.params.id)
     .then(() => res.status(HTTPStatus.NO_CONTENT).end())
     .catch(err => next(err));
@@ -52,10 +51,10 @@ function updateQuoteCollection(req, res, next) {
 }
 
 function addNewQuote(req, res, next) {
-    QuoteCollection.findById(req.params.id)
-      .then(quoteCollection => quoteCollection.addQuote(req.body.quote_id))
-      .then(queryStatus => res.status(HTTPStatus.OK).send(queryStatus))
-      .catch(err => next(err));
+  QuoteCollection.findById(req.params.id)
+    .then(quoteCollection => quoteCollection.addQuote(req.body.quote_id))
+    .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
+    .catch(err => next(err));
 }
 
 function deleteQuote(req, res, next) {
@@ -74,7 +73,7 @@ function addNewCollaborator(req, res, next) {
     .catch(err => next(err));
 }
 
-function removeCollaborators(req, res, next){
+function removeCollaborators(req, res, next) {
   let collaborator_ids = req.body.collaborator_ids || [];
   QuoteCollection.findById(req.params.id)
     .then(quoteCollection => quoteCollection.removeCollaborators(collaborator_ids))
