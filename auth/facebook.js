@@ -14,7 +14,7 @@ const auth = new FacebookStrategy({
 module.exports = auth;
 
 function authorize(accessToken, refreshToken, profile, done) {
-  let facebookId = profile.facebook_id;
+  let facebookId = profile.id;
   let email = getProp(profile, 'emails[0].value');
 
   let query = { facebookId } || { email };
@@ -23,8 +23,8 @@ function authorize(accessToken, refreshToken, profile, done) {
     if (user) return done(null, user);
 
     User.create({
-      facebookId: profile.id,
-      email: profile.emails[0].value,
+      facebookId,
+      email,
       name: profile.displayName,
       gender: profile.gender
     }, done);

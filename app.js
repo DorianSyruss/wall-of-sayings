@@ -16,14 +16,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(session({
-  secret: 'keyboard cat',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true
 }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(`${ __dirname }/public`));
 
 // add api routes
 require('./api')(app);
@@ -38,4 +38,4 @@ let port = process.env.PORT || 8080;
 
 // tell the app to listen on specified port
 app.listen(port);
-console.log('Server running on port: ' + port);
+console.log(`Server running on port: ${ port }`);

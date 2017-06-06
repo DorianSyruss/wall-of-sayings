@@ -4,9 +4,13 @@ const HTTPStatus = require('http-status');
 const router = require('express').Router();
 const User = require('../models/user');
 const { isAdmin } = require('../auth/permissions');
+const dropProperties = require('lodash/omit');
+
+//props to omit for this data model, safety measure
+const immutables = ['role'];
 
 router.get('/users', isAdmin, listUsers);
-router.post('/register', createUser);
+router.post('/signup', createUser);
 router.get('/users/:id', getUser);
 router.put('/users/:id', updateUser);
 router.delete('/users/:id', deleteUser);
@@ -20,7 +24,8 @@ function listUsers(req, res, next){
 }
 
 function createUser(req, res, next) {
-  User.create(req.body)
+  const data = dropProperties(req.body, immutables);
+  User.create(data)
     .then(user => res.status(HTTPStatus.OK).send(user))
     .catch(err => next(err));
 }
@@ -38,8 +43,8 @@ function deleteUser(req, res, next) {
 }
 
 function updateUser(req, res, next) {
-  let update = { name: req.body.name, surname: req.body.surname };
-  User.findOneAndUpdate(req.params.id, update, { new: true })
+  const data = dropProperties(req.body, immutables);
+  User.findOneAndUpdate(req.params.id, data, { new: true })
     .then(user => res.status(HTTPStatus.OK).send(user))
     .catch(err => next(err));
 }

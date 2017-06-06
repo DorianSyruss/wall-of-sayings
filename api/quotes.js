@@ -3,6 +3,10 @@
 const Quote = require('../models/quote');
 const router = require('express').Router();
 const HTTPStatus = require('http-status');
+const dropProperties = require('lodash/omit');
+
+//props to omit for this data model, safety measure
+const immutables = ['owner'];
 
 router.get('/quotes', listQuotes);
 router.post('/quotes', createQuote);
@@ -24,9 +28,9 @@ function getQuote(req, res, next) {
     .catch(err => next(err));
 }
 
-function createQuote(req, res, next){
-  let { quote, author } = req.body;
-  Quote.create({ quote, author })
+function createQuote(req, res, next) {
+  const data = dropProperties(req.body, immutables);
+  Quote.create(data)
     .then(quote => res.status(HTTPStatus.OK).send(quote))
     .catch(err => next(err));
 }
@@ -38,8 +42,8 @@ function deleteQuote(req, res, next) {
 }
 
 function updateQuote(req, res, next) {
-  let update = { quote: req.body.quote, author: req.body.author };
-  Quote.findOneAndUpdate(req.params.id, update, { new: true })
+  const data = dropProperties(req.body, immutables);
+  Quote.findOneAndUpdate(req.params.id, data, { new: true })
     .then(quote => res.status(HTTPStatus.OK).send(quote))
     .catch(err => next(err));
 }

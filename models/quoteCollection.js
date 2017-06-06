@@ -14,17 +14,15 @@ const quoteCollection = new Schema({
 });
 
 Object.assign(quoteCollection.methods, {
-  addQuote(quoteId) {
-    return this.update({ $addToSet: { quotes: quoteId } });
-  },
 
-  deleteQuotes(quoteIds) {
-    this.quotes.remove(...quoteIds);
+  addQuote(quoteId) {
+    this.quotes.addToSet(...quoteId);
     return this.save();
   },
 
-  deleteQuote(quoteId) {
-    return this.deleteQuotes(quoteId);
+  deleteQuotes(quoteIds = []) {
+    this.quotes.remove(...quoteIds);
+    return this.save();
   },
 
   getQuotes() {
@@ -32,8 +30,9 @@ Object.assign(quoteCollection.methods, {
     return Promise.all(this.quotes.map(id => Quote.findById(id)));
   },
 
-  addCollaborators(collaborator_ids) {
-    return this.update({ $addToSet: { collaborators: { $each: collaborator_ids } } });
+  addCollaborators(collaborator_ids = []) {
+    this.collaborators.addToSet(...collaborator_ids);
+    return this.save();
   },
 
   removeCollaborators(collaborators_ids) {

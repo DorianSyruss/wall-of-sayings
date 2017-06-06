@@ -6,9 +6,16 @@ const quotes = require('./quotes');
 const quoteCollections = require('./collections');
 const { isLoggedIn } = require('../auth/permissions');
 const contains = require('lodash/some');
+const { parse } = require('url');
 
 const publicRoutes = [{
   path: '/api',
+  method: 'GET'
+}, {
+  path: '/api/auth/facebook',
+  method: 'GET'
+}, {
+  path: '/api/auth/facebook/callback',
   method: 'GET'
 }, {
   path: '/api/auth/login',
@@ -27,7 +34,8 @@ const publicRoutes = [{
 const isPublicRoute = route => contains(publicRoutes, route);
 
 function checkAccessRights(req, res, next) {
-  let routeDesc = { path: req.originalUrl, method: req.method };
+  const { pathname } = parse(req.originalUrl);
+  const routeDesc = { path: pathname, method: req.method };
   if (isPublicRoute(routeDesc)) {
     next();
     return;

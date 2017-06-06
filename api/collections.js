@@ -3,16 +3,17 @@
 const HTTPStatus = require('http-status');
 const router = require('express').Router();
 const QuoteCollection = require('../models/quoteCollection');
-const { isLoggedIn } = require('../auth/permissions');
+const dropProperties = require('lodash/omit');
 
-router.use(isLoggedIn);
+//props to omit for this data model, safety measure
+const immutables = ['owner'];
 
 router.get('/collections', listQuoteCollections);
 router.post('/collections', createQuoteCollection);
 router.get('/collections/:id', getQuoteCollection);
 router.put('/collections/:id', updateQuoteCollection);
 router.delete('/collections/:id', deleteQuoteCollection);
-router.post('/collections/:id/collaborators', addNewCollaborator);
+router.post('/collections/:id/collaborators', addNewCollaborators);
 router.delete('/collections/:id/collaborators', removeCollaborators);
 router.get('/collections/:id/quotes', listCollectionQuotes);
 router.post('/collections/:id/quotes', addNewQuote);
@@ -33,7 +34,8 @@ function getQuoteCollection(req, res, next) {
 }
 
 function createQuoteCollection(req, res, next) {
-  QuoteCollection.create(req.body)
+  const data = dropProperties(req.body, immutables);
+  QuoteCollection.create(data)
     .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
     .catch(err => next(err));
 }
@@ -45,31 +47,32 @@ function deleteQuoteCollection(req, res, next) {
 }
 
 function updateQuoteCollection(req, res, next) {
-  QuoteCollection.findOneAndUpdate(req.params.id, req.body, { new: true })
+  const data = dropProperties(req.body, immutables);
+  QuoteCollection.findOneAndUpdate(req.params.id, data, { new: true })
     .then(quote => res.status(HTTPStatus.OK).send(quote))
     .catch(err => next(err));
 }
 
 function addNewQuote(req, res, next) {
   QuoteCollection.findById(req.params.id)
-    .then(quoteCollection => quoteCollection.addQuote(req.body.quote_id))
-    .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
+    .then((quoteCollection) => quoteCollection.addQuote(req.body.quote_ids))
+    .then((quoteCollection) => res.status(HTTPStatus.OK).send(quoteCollection))
     .catch(err => next(err));
 }
 
 function deleteQuote(req, res, next) {
-  let quote_ids = req.body.quote_ids || [];
+  let quote_ids = req.body.quote_ids;
   QuoteCollection.findById(req.params.id)
-    .then(quoteCollection => quoteCollection.deleteQuote(quote_ids))
-    .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
+    .then(quoteCollection => quoteCollection.deleteQuotes(quote_ids))
+    .then((status) => res.status(HTTPStatus.OK).send(status))
     .catch(err => next(err));
 }
 
-function addNewCollaborator(req, res, next) {
-  let collaborator_ids = req.body.collaborator_ids || [];
+function addNewCollaborators(req, res, next) {
+  let collaborator_ids = req.body.collaborator_ids;
   QuoteCollection.findById(req.params.id)
     .then(quoteCollection => quoteCollection.addCollaborators(collaborator_ids))
-    .then(queryStatus => res.status(HTTPStatus.OK).send(queryStatus))
+    .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
     .catch(err => next(err));
 }
 
@@ -77,15 +80,13 @@ function removeCollaborators(req, res, next) {
   let collaborator_ids = req.body.collaborator_ids || [];
   QuoteCollection.findById(req.params.id)
     .then(quoteCollection => quoteCollection.removeCollaborators(collaborator_ids))
-    .then(queryStatus => res.status(HTTPStatus.OK).send(queryStatus))
+    .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
     .catch(err => next(err));
 }
 
 function listCollectionQuotes(req, res, next) {
   QuoteCollection.findById(req.params.id)
     .then(collection => collection.getQuotes())
-    .then(quotes => { res.status(HTTPStatus.OK).send(quotes); })
+    .then(quotes => res.status(HTTPStatus.OK).send(quotes))
     .catch(err => next(err));
 }
-
-
