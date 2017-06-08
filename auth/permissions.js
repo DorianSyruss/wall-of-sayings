@@ -1,30 +1,19 @@
 'use strict';
 
 const HTTPStatus = require('http-status');
-const User = require('../models/user');
+const ConnectRoles = require('connect-roles');
+const Roles = require('../models/user').roles;
 
-function isAdmin(req, res, next) {
-  if (User.isAdmin(req.user)) {
-    next();
-    return;
+const user = new ConnectRoles({
+  failureHandler(req, res, action) {
+    res.status(HTTPStatus.UNAUTHORIZED).send(`Can't ${action}`);
   }
-  const data = {
-    success: false,
-    error: 'Not allowed!'
-  };
-  res.status(HTTPStatus.FORBIDDEN).json(data);
-}
+});
 
-function isLoggedIn(req, res, next) {
-  if (req.user) {
-    next();
-    return;
-  }
-  const data = {
-    success: false,
-    error: 'Not authorized!'
-  };
-  res.status(HTTPStatus.UNAUTHORIZED).json(data);
-}
+user.use('authenticated', req => req.isAuthenticated());
 
-module.exports = { isAdmin, isLoggedIn };
+user.use('user', req => req.user.role === Roles.User);
+
+user.use('admin', req => req.user.role === Roles.Admin);
+
+module.exports = { user };

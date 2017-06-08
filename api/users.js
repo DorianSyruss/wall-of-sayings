@@ -3,13 +3,12 @@
 const HTTPStatus = require('http-status');
 const router = require('express').Router();
 const User = require('../models/user');
-const { isAdmin } = require('../auth/permissions');
 const dropProperties = require('lodash/omit');
 
 //props to omit for this data model, safety measure
 const immutables = ['role'];
 
-router.get('/users', isAdmin, listUsers);
+router.get('/users', listUsers);
 router.post('/signup', createUser);
 router.get('/users/:id', getUser);
 router.put('/users/:id', updateUser);

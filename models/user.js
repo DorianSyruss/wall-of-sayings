@@ -2,7 +2,7 @@
 
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
-const { Schema } = require('mongoose');
+const { Schema } = mongoose;
 
 const SALT_WORK_FACTOR = 8;
 
@@ -56,6 +56,9 @@ Object.assign(User.methods, {
 Object.assign(User.statics, {
   isAdmin(user) {
     return user && user.role === Role.Admin;
+  },
+  get roles() {
+    return Role;
   }
 });
 

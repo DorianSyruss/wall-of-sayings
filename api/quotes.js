@@ -4,12 +4,13 @@ const Quote = require('../models/quote');
 const router = require('express').Router();
 const HTTPStatus = require('http-status');
 const dropProperties = require('lodash/omit');
+const { user } = require('../auth/permissions');
 
 //props to omit for this data model, safety measure
 const immutables = ['owner'];
 
 router.get('/quotes', listQuotes);
-router.post('/quotes', createQuote);
+router.post('/quotes', user.is('authenticated'), createQuote);
 router.get('/quotes/:id', getQuote);
 router.put('/quotes/:id', updateQuote);
 router.delete('/quotes/:id', deleteQuote);

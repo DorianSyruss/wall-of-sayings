@@ -23,7 +23,7 @@ router.post('/auth/login', passport.authenticate('local'),
 
 router.get('/auth/logout', (req, res) => {
   req.session.destroy(() => {
-    res.status(HTTPStatus.OK);
+    res.status(HTTPStatus.OK).send('Logged Out');
   });
 });
 module.exports = router;

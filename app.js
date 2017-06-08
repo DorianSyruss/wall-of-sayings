@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const HTTPStatus = require('http-status');
 const { db, dbUri } = require('./db');
 const app = express();
+const { user } = require('./auth/permissions');
 
 db.on('error', e => console.error('connection error:', e));
 db.once('open', () => console.log('connection established', dbUri));
@@ -22,6 +23,7 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(user.middleware());
 
 app.use(express.static(`${ __dirname }/public`));
 
