@@ -2,26 +2,32 @@
   {
     "title": "collection1",
     "description": "great collection 1",
-    "category": "science"
+    "category": "science",
+    "visible": true
   },
   {
     "title": "collection2",
     "description": "great collection 2",
-    "category": "life"
+    "category": "life",
+    "visible": true
+
   },
   {
     "title": "collection3",
     "description": "great collection 3",
-    "category": "philosophy"
+    "category": "philosophy",
+    "visible": true
   },
   {
     "title": "collection4",
     "description": "great collection 4",
-    "category": "cultural"
+    "category": "cultural",
+    "visible": false
   },
   {
     "title": "collection5",
     "description": "great collection 5",
-    "category": "inspiring"
+    "category": "inspiring",
+    "visible": false
   }
 ]

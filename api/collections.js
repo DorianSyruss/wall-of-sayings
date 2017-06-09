@@ -4,9 +4,14 @@ const HTTPStatus = require('http-status');
 const router = require('express').Router();
 const QuoteCollection = require('../models/quoteCollection');
 const dropProperties = require('lodash/omit');
+const { user } = require('../auth/permissions');
 
 //props to omit for this data model, safety measure
 const immutables = ['owner'];
+
+router.post('/collections', user.is('auth'));
+router.get('/collections', user.is('owner or admin'));
+router.use('*!/collections', user.is('owner or admin'));
 
 router.get('/collections', listQuoteCollections);
 router.post('/collections', createQuoteCollection);

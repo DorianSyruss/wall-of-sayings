@@ -9,6 +9,7 @@ const quoteCollection = new Schema({
   title: String,
   description: String,
   category: String,
+  type: String,
   quotes: [ObjectId],
   collaborators: [ObjectId]
 });

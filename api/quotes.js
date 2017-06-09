@@ -12,8 +12,8 @@ const immutables = ['owner'];
 router.get('/quotes', listQuotes);
 router.post('/quotes', user.is('authenticated'), createQuote);
 router.get('/quotes/:id', getQuote);
-router.put('/quotes/:id', updateQuote);
-router.delete('/quotes/:id', deleteQuote);
+router.put('/quotes/:id', user.is('authenticated'), updateQuote);
+router.delete('/quotes/:id', user.is('authenticated'), deleteQuote);
 
 module.exports = router;
 
