@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const { ObjectId } = Schema;
 
+
 const quoteCollection = new Schema({
   owner: ObjectId,
   title: String,
@@ -17,8 +18,16 @@ const quoteCollection = new Schema({
 Object.assign(quoteCollection.methods, {
 
   addQuote(quoteId) {
-    this.quotes.addToSet(...quoteId);
-    return this.save();
+    return mongoose.model('Quote').findById(quoteId)
+      .then(quote => {
+        if (!quote) {
+          return;
+        }
+
+        this.quotes.addToSet(quote.id);
+        return quote.incrementCount();
+    })
+      .then(() => this.save());
   },
 
   deleteQuotes(quoteIds = []) {

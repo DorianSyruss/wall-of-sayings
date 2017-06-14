@@ -10,10 +10,10 @@ const { user } = require('../auth/permissions');
 const immutables = ['owner'];
 
 router.get('/quotes', listQuotes);
-router.post('/quotes', user.is('authenticated'), createQuote);
+router.post('/quotes', user.is('owner or admin'), createQuote);
 router.get('/quotes/:id', getQuote);
-router.put('/quotes/:id', user.is('authenticated'), updateQuote);
-router.delete('/quotes/:id', user.is('authenticated'), deleteQuote);
+router.put('/quotes/:id', user.is('owner or admin'), updateQuote);
+router.delete('/quotes/:id', user.is('owner or admin'), deleteQuote);
 
 module.exports = router;
 

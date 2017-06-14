@@ -9,11 +9,11 @@ const { user } = require('../auth/permissions');
 //props to omit for this data model, safety measure
 const immutables = ['role'];
 
-router.get('/users', listUsers);
+router.get('/users', user.is('auth'), listUsers);
 router.post('/signup', createUser);
-router.get('/users/:id', getUser);
-router.put('/users/:id', user.is('authenticated'), user.is('admin'), updateUser);
-router.delete('/users/:id', user.is('admin'), deleteUser);
+router.get('/users/:id', user.is('auth'), getUser);
+router.put('/users/:id', user.is('owner or admin'), updateUser);
+router.delete('/users/:id', user.is('owner or admin'), deleteUser);
 
 module.exports = router;
 

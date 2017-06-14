@@ -12,6 +12,11 @@ const quote = new Schema({
 Object.assign(quote.methods, {
   getAuthor() {
     return this.author;
+  },
+
+  incrementCount(){
+    this.favoritedCount++;
+    return this.save();
   }
 });
 

@@ -4,32 +4,46 @@ const HTTPStatus = require('http-status');
 const router = require('express').Router();
 const QuoteCollection = require('../models/quoteCollection');
 const dropProperties = require('lodash/omit');
+const Quote = require('../models/quote');
+const Roles = require('../models/user').roles;
 const { user } = require('../auth/permissions');
 
 //props to omit for this data model, safety measure
 const immutables = ['owner'];
 
-router.post('/collections', user.is('auth'));
-router.get('/collections', user.is('owner or admin'));
-router.use('*!/collections', user.is('owner or admin'));
-
-router.get('/collections', listQuoteCollections);
-router.post('/collections', createQuoteCollection);
-router.get('/collections/:id', getQuoteCollection);
-router.put('/collections/:id', updateQuoteCollection);
-router.delete('/collections/:id', deleteQuoteCollection);
-router.post('/collections/:id/collaborators', addNewCollaborators);
-router.delete('/collections/:id/collaborators', removeCollaborators);
-router.get('/collections/:id/quotes', listCollectionQuotes);
-router.post('/collections/:id/quotes', addNewQuote);
-router.delete('/collections/:id/quotes', deleteQuote);
+router.get('/me/collections', user.is('auth'), listMyCollections);
+router.get('/collections', user.is('auth'), listQuoteCollections);
+router.post('/collections', user.is('owner or admin'),  createQuoteCollection);
+router.get('/collections/:id', user.is('owner or admin'), getQuoteCollection);
+router.put('/collections/:id', user.is('owner or admin'), updateQuoteCollection);
+router.delete('/collections/:id', user.is('owner or admin'), deleteQuoteCollection);
+router.post('/collections/:id/collaborators', user.is('owner or admin'), addNewCollaborators);
+router.delete('/collections/:id/collaborators', user.is('owner or admin'), removeCollaborators);
+router.get('/collections/:id/quotes', user.is('owner or admin'), listCollectionQuotes);
+router.post('/collections/:id/quotes', user.is('owner or admin'), addQuote);
+router.delete('/collections/:id/quotes', user.is('owner or admin'), deleteQuote);
 
 module.exports = router;
 
 function listQuoteCollections(req, res, next) {
-  QuoteCollection.find(req.query)
-    .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
+  let isAdmin = (req.user.role === Roles.Admin);
+  let query;
+
+  if (isAdmin) {
+    query = QuoteCollection.find();
+  } else {
+    query = QuoteCollection.find({ type: 'public' });
+  }
+
+  query
+    .then(quoteCollections => res.status(HTTPStatus.OK).send(quoteCollections))
     .catch(err => next(err));
+}
+
+function listMyCollections(req, res, next) {
+  QuoteCollection.find({ owner: req.user.id })
+    .then((quoteCollections) => res.status(HTTPStatus.OK).send(quoteCollections))
+    .catch((err) => next(err));
 }
 
 function getQuoteCollection(req, res, next) {
@@ -58,12 +72,13 @@ function updateQuoteCollection(req, res, next) {
     .catch(err => next(err));
 }
 
-function addNewQuote(req, res, next) {
-  QuoteCollection.findById(req.params.id)
-    .then((quoteCollection) => quoteCollection.addQuote(req.body.quote_ids))
-    .then((quoteCollection) => res.status(HTTPStatus.OK).send(quoteCollection))
-    .catch(err => next(err));
+function addQuote(req, res, next) {
+    QuoteCollection.findById(req.params.id)
+      .then(quoteCollection => quoteCollection.addQuote(req.body.quote_id))
+      .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
+      .catch((err) => next(err));
 }
+
 
 function deleteQuote(req, res, next) {
   let quote_ids = req.body.quote_ids;
