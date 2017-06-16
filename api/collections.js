@@ -4,7 +4,6 @@ const HTTPStatus = require('http-status');
 const router = require('express').Router();
 const QuoteCollection = require('../models/quoteCollection');
 const dropProperties = require('lodash/omit');
-const Quote = require('../models/quote');
 const Roles = require('../models/user').roles;
 const { user } = require('../auth/permissions');
 
@@ -76,9 +75,9 @@ function addQuote(req, res, next) {
     QuoteCollection.findById(req.params.id)
       .then(quoteCollection => quoteCollection.addQuote(req.body.quote_id))
       .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
+      .error(e => res.status(HTTPStatus.BAD_REQUEST).send(e.message))
       .catch((err) => next(err));
 }
-
 
 function deleteQuote(req, res, next) {
   let quote_ids = req.body.quote_ids;

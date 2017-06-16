@@ -1,6 +1,7 @@
 'use strict';
 
 const mongoose = require('mongoose');
+const { OperationalError } = require('bluebird');
 const { Schema } = mongoose;
 const { ObjectId } = Schema;
 
@@ -21,7 +22,7 @@ Object.assign(quoteCollection.methods, {
     return mongoose.model('Quote').findById(quoteId)
       .then(quote => {
         if (!quote) {
-          return;
+          return Promise.reject(new OperationalError('Quote not found'));
         }
 
         this.quotes.addToSet(quote.id);
