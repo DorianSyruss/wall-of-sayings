@@ -73,17 +73,17 @@ function updateQuoteCollection(req, res, next) {
 
 function addQuote(req, res, next) {
     QuoteCollection.findById(req.params.id)
-      .then(quoteCollection => quoteCollection.addQuote(req.body.quote_id))
+      .then(quoteCollection => quoteCollection.addQuote(req.body.quote_id, req.user.id))
       .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
       .error(e => res.status(HTTPStatus.BAD_REQUEST).send(e.message))
       .catch((err) => next(err));
 }
 
 function deleteQuote(req, res, next) {
-  let quote_ids = req.body.quote_ids;
   QuoteCollection.findById(req.params.id)
-    .then(quoteCollection => quoteCollection.deleteQuotes(quote_ids))
+    .then(quoteCollection => quoteCollection.deleteQuotes(req.body.quote_id, req.user.id))
     .then((status) => res.status(HTTPStatus.OK).send(status))
+    .error((e) => res.status(HTTPStatus.BAD_REQUEST).send(e.message))
     .catch(err => next(err));
 }
 

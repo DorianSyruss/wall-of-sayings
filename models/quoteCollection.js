@@ -18,7 +18,7 @@ const quoteCollection = new Schema({
 
 Object.assign(quoteCollection.methods, {
 
-  addQuote(quoteId) {
+  addQuote(quoteId, userId) {
     return mongoose.model('Quote').findById(quoteId)
       .then(quote => {
         if (!quote) {
@@ -26,14 +26,24 @@ Object.assign(quoteCollection.methods, {
         }
 
         this.quotes.addToSet(quote.id);
-        return quote.incrementCount();
+        quote.trackUser(userId); //remember(track) the user that saved the quote
+        return quote.countFavorites();
     })
       .then(() => this.save());
   },
 
-  deleteQuotes(quoteIds = []) {
-    this.quotes.remove(...quoteIds);
-    return this.save();
+  deleteQuotes(quoteId, userId) {
+    return mongoose.model('Quote').findById(quoteId)
+      .then(quote => {
+        if (!quote) {
+          return Promise.reject(new OperationalError('Quote does not exist'));
+        }
+
+        this.quotes.remove(quoteId);
+        quote.untrackUser(userId);
+        return quote.countFavorites();
+      })
+      .then(() => this.save());
   },
 
   getQuotes() {
