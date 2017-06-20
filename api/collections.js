@@ -13,7 +13,7 @@ const immutables = ['owner'];
 router.get('/me/collections', user.is('auth'), listMyCollections);
 router.get('/collections', user.is('auth'), listQuoteCollections);
 router.post('/collections', user.is('owner or admin'),  createQuoteCollection);
-router.get('/collections/:id', user.is('owner or admin'), getQuoteCollection);
+router.get('/collections/:id', user.is('auth'), getQuoteCollection);
 router.put('/collections/:id', user.is('owner or admin'), updateQuoteCollection);
 router.delete('/collections/:id', user.is('owner or admin'), deleteQuoteCollection);
 router.post('/collections/:id/collaborators', user.is('owner or admin'), addNewCollaborators);
@@ -46,8 +46,17 @@ function listMyCollections(req, res, next) {
 }
 
 function getQuoteCollection(req, res, next) {
+  let isAdmin = (req.user.role === Roles.Admin);
+
   QuoteCollection.findById(req.params.id)
-    .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
+    .then(quoteCollection => {
+      if (quoteCollection.type === 'public' || isAdmin) {
+        res.status(HTTPStatus.OK).send(quoteCollection);
+      }
+      else {
+        res.status(HTTPStatus.UNAUTHORIZED).send('Collection is private');
+      }
+    })
     .catch(err => next(err));
 }
 

@@ -41,3 +41,5 @@ let port = process.env.PORT || 8080;
 // tell the app to listen on specified port
 app.listen(port);
 console.log(`Server running on port: ${ port }`);
+
+module.exports = { app };
