@@ -3,8 +3,7 @@
 const mongoose = require('mongoose');
 const { OperationalError } = require('bluebird');
 const { Schema } = mongoose;
-const { ObjectId } = Schema;
-
+const { ObjectId } = Schema
 
 const quoteCollection = new Schema({
   owner: ObjectId,

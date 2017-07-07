@@ -13,7 +13,11 @@ const user = new ConnectRoles({
   }
 });
 
+// check roles strategies
+
 user.use('auth', req => req.isAuthenticated());
+
+user.use('admin', req => get(req, 'user.role') === Roles.Admin ? true : undefined);
 
 user.use('owner or admin', req => req.isAuthenticated() ? undefined : false);
 user.use('owner or admin', req => get(req, 'user.role') === Roles.Admin ? true : undefined);

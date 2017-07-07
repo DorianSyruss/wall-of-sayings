@@ -25,20 +25,14 @@ Promise.all([
 .then(() => db.close())
 .catch(err => console.log(err, err.stack));
 
-
 function seedCollections(users, quotes) {
   console.log('Seeding collections..');
-  // remove all collections
   return QuoteCollection.remove()
-    // populate collections
     .then(() => {
       collections.forEach(collection => {
-        // add owner and collaborators
         addUsers(collection, users);
-        // add quotes
         addQuotes(collection, quotes);
       });
-      // store collections
       return QuoteCollection.create(collections);
     })
     .then(() => console.log('Collections created'));
