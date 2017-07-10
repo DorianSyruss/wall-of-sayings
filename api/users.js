@@ -9,13 +9,30 @@ const { user } = require('../auth/permissions');
 //props to omit for this data model, safety measure
 const immutables = ['role'];
 
-router.get('/users', user.is('auth'), listUsers);
-router.post('/signup', createUser);
-router.get('/users/:id', user.is('auth'), getUser);
+//guest routes
+router.post('/guest/signup', createUser);
+
+//logged user specific routes
+router.get('/public/users', user.is('auth'), listPublicUsers);
+router.get('/public/users/:id', user.is('auth'), getUser);
+
+//accessible with any role
+
+
+//role based authorization
+router.get('/users', user.is('admin'), listUsers);
 router.put('/users/:id', user.is('owner or admin'), updateUser);
 router.delete('/users/:id', user.is('owner or admin'), deleteUser);
 
 module.exports = router;
+
+//list all users with publicly appropriate data
+function listPublicUsers(req, res, next) {
+  const privateData = ['email', 'password'];
+  User.find().omit(privateData)
+    .then(users => res.status(HTTPStatus.OK).send(users))
+    .catch(err => next(err));
+}
 
 function listUsers(req, res, next){
   User.find()

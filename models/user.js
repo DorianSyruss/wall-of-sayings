@@ -2,6 +2,7 @@
 
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
+const helpers = require('./helpers');
 const { Schema } = mongoose;
 
 const SALT_WORK_FACTOR = 8;
@@ -42,6 +43,8 @@ User.pre('save', function (next) {
     });
   });
 });
+
+Object.assign(User.query, helpers);
 
 Object.assign(User.methods, {
   getFullName() {

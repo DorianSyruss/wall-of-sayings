@@ -1,6 +1,7 @@
 'use strict';
 
 require('dotenv').config();
+const path = require('path');
 const passport = require('./auth');
 const express = require('express');
 const session = require('express-session');
@@ -25,7 +26,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(user.middleware());
 
-app.use(express.static(`${ __dirname }/public`));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // add api routes
 require('./api')(app);
