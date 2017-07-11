@@ -13,18 +13,25 @@ const immutables = ['role'];
 router.post('/guest/signup', createUser);
 
 //logged user specific routes
-router.get('/public/users', user.is('auth'), listPublicUsers);
-router.get('/public/users/:id', user.is('auth'), getUser);
+router.get('/me/profile', user.is('auth'), getMyProfile);
 
 //accessible with any role
-
+router.get('/public/users', user.is('auth'), listPublicUsers);
+router.get('/public/users/:id', user.is('auth'), getPublicUser);
 
 //role based authorization
 router.get('/users', user.is('admin'), listUsers);
+router.get('/users/:id', user.is('admin'), getUser);
 router.put('/users/:id', user.is('owner or admin'), updateUser);
 router.delete('/users/:id', user.is('owner or admin'), deleteUser);
 
 module.exports = router;
+
+function getMyProfile(req, res, next) {
+  User.findById({ _id: req.user.id })
+    .then(user => res.status(HTTPStatus.OK).send(user))
+    .catch(err => next(err));
+}
 
 //list all users with publicly appropriate data
 function listPublicUsers(req, res, next) {
@@ -34,8 +41,16 @@ function listPublicUsers(req, res, next) {
     .catch(err => next(err));
 }
 
-function listUsers(req, res, next){
-  User.find()
+function getPublicUser(req, res, next) {
+  const privateData = ['email', 'password'];
+  User.findById(req.params.id).omit(privateData)
+    .then(user => res.status(HTTPStatus.OK).send(user))
+    .catch(err => next(err));
+}
+
+function listUsers(req, res, next) {
+  const privateData = ['password'];
+  User.find().omit(privateData)
     .then(user => res.status(HTTPStatus.OK).send(user))
     .catch(err => next(err));
 }
@@ -48,7 +63,8 @@ function createUser(req, res, next) {
 }
 
 function getUser(req, res, next) {
-  User.findById(req.params.id)
+  const privateData = ['password'];
+  User.findById(req.params.id).omit(privateData)
     .then(user => res.status(HTTPStatus.OK).send(user))
     .catch(err => next(err));
 }
