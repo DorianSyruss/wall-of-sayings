@@ -2,26 +2,31 @@
   {
     "quote": "was is das1",
     "author": "John Doe",
+    "type:": "public",
     "favoritedCount": 0
   },
   {
     "quote": "was is das2",
     "author": "John Doe",
+    "type": "public",
     "favoritedCount": 0
   },
   {
     "quote": "was is das3",
     "author": "Jane Doe",
+    "type": "public",
     "favoritedCount": 0
   },
   {
     "quote": "was is das4",
     "author": "Jane Doe",
+    "type": "public",
     "favoritedCount": 0
   },
   {
     "quote": "was is das5",
     "author": "Jane Doe",
+    "type": "private",
     "favoritedCount": 0
   }
 ]

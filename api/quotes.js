@@ -7,19 +7,41 @@ const dropProperties = require('lodash/omit');
 const { user } = require('../auth/permissions');
 
 //props to omit for this data model, safety measure
-const immutables = ['owner'];
+const immutables = ['owner', 'favoritedCount'];
 
-router.get('/quotes', listQuotes);
-router.post('/quotes', user.is('owner or admin'), createQuote);
-router.get('/quotes/:id', getQuote);
+//guest routes
+router.get('/guest/quotes', listPublicQuotes);
+
+//logged user specific routes
+router.get('/me/quotes', user.is('auth'), listMyQuotes);
+router.post('/me/quotes', user.is('auth'), createMyQuote);
+
+//accessible with any role
+
+//role based authorization
+router.get('/quotes', user.is('admin'), listQuotes);
+router.post('/quotes', user.is('admin'), createQuote);
+router.get('/quotes/:id', user.is('admin'), getQuote);
 router.put('/quotes/:id', user.is('owner or admin'), updateQuote);
 router.delete('/quotes/:id', user.is('owner or admin'), deleteQuote);
 
 module.exports = router;
 
+function listPublicQuotes(req, res, next) {
+  Quote.find({ type: 'public' })
+    .then(quotes => res.status(HTTPStatus.OK).send(quotes))
+    .catch(err => next(err));
+}
+
+function listMyQuotes(req, res, next) {
+  Quote.find({ owner: req.user.id })
+    .then(quotes => res.status(HTTPStatus.OK).send(quotes))
+    .catch(err => next(err));
+}
+
 function listQuotes(req, res, next) {
   Quote.find()
-    .then(quote => res.status(HTTPStatus.OK).send(quote))
+    .then(quotes => res.status(HTTPStatus.OK).send(quotes))
     .catch(err => next(err));
 }
 
@@ -31,6 +53,18 @@ function getQuote(req, res, next) {
 
 function createQuote(req, res, next) {
   const data = dropProperties(req.body, immutables);
+  data.type = 'public';
+  Quote.create(data)
+    .then(quote => res.status(HTTPStatus.OK).send(quote))
+    .catch(err => next(err));
+}
+
+function createMyQuote(req, res, next) {
+  let data = req.body;
+  data = dropProperties(data, immutables);
+  data.owner = req.user.id;
+  data.type = 'private';
+
   Quote.create(data)
     .then(quote => res.status(HTTPStatus.OK).send(quote))
     .catch(err => next(err));

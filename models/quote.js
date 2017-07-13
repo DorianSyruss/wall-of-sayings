@@ -7,8 +7,11 @@ const { ObjectId } = Schema;
 const quote = new Schema({
   quote: String,
   author: String,
+  type: String,
+  owner: ObjectId,
   favoritedCount: Number,
-  favoritedBy: [ObjectId]
+  favoritedBy: [ObjectId],
+  publishedOn: Date
 });
 
 Object.assign(quote.methods, {
@@ -26,7 +29,7 @@ Object.assign(quote.methods, {
     return this.save();
   },
 
-  countFavorites(){
+  countFavorites() {
     return this.favoritedCount = this.favoritedBy.length;
   }
 });
