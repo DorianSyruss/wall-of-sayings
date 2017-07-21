@@ -31,7 +31,7 @@ Object.assign(quoteCollection.methods, {
       .then(() => this.save());
   },
 
-  deleteQuotes(quoteId, userId) {
+  removeQuote(quoteId, userId) {
     return mongoose.model('Quote').findById(quoteId)
       .then(quote => {
         if (!quote) {
@@ -58,6 +58,12 @@ Object.assign(quoteCollection.methods, {
   removeCollaborators(collaborators_ids) {
     this.collaborators.remove(...collaborators_ids);
     return this.save();
+  },
+
+  getCollaborators() {
+    const privateData = ['password'];
+    const User = mongoose.model('User');
+    return Promise.all(this.collaborators.map(id => User.findById(id).omit(privateData)));
   }
 });
 

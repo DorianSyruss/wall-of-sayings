@@ -15,6 +15,8 @@ router.get('/guest/quotes', listPublicQuotes);
 //logged user specific routes
 router.get('/me/quotes', user.is('auth'), listMyQuotes);
 router.post('/me/quotes', user.is('auth'), createMyQuote);
+router.get('/me/quotes/:id', user.is('auth'), getMyQuote);
+router.delete('/me/quotes/:id', user.is('owner or admin'), deleteMyQuote);
 
 //accessible with any role
 
@@ -23,7 +25,7 @@ router.get('/quotes', user.is('admin'), listQuotes);
 router.post('/quotes', user.is('admin'), createQuote);
 router.get('/quotes/:id', user.is('admin'), getQuote);
 router.put('/quotes/:id', user.is('owner or admin'), updateQuote);
-router.delete('/quotes/:id', user.is('owner or admin'), deleteQuote);
+router.delete('/quotes/:id', user.is('admin'), deleteQuote);
 
 module.exports = router;
 
@@ -51,6 +53,18 @@ function getQuote(req, res, next) {
     .catch(err => next(err));
 }
 
+function getMyQuote(req, res, next) {
+  const data = { owner: req.user.id, _id: req.params.id };
+  Quote.findOne(data)
+    .then(quote => {
+      if (!quote) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return res.status(HTTPStatus.OK).send(quote);
+    })
+    .catch(err => next(err));
+}
+
 function createQuote(req, res, next) {
   const data = dropProperties(req.body, immutables);
   data.type = 'public';
@@ -71,6 +85,12 @@ function createMyQuote(req, res, next) {
 }
 
 function deleteQuote(req, res, next) {
+  Quote.findByIdAndRemove(req.params.id)
+    .then(() => res.status(HTTPStatus.NO_CONTENT).end())
+    .catch(err => next(err));
+}
+
+function deleteMyQuote(req, res, next) {
   Quote.findByIdAndRemove(req.params.id)
     .then(() => res.status(HTTPStatus.NO_CONTENT).end())
     .catch(err => next(err));

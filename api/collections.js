@@ -9,36 +9,69 @@ const { user } = require('../auth/permissions');
 //props to omit for this data model, safety measure
 const immutables = ['owner'];
 
-//logged user specific routes
-router.get('/me/collections', user.is('auth'), listMyCollections);
-router.post('/collections', user.is('auth'),  createQuoteCollection);
-
 //accessible with any role
 router.get('/public/collections', user.is('auth'), listPublicCollections);
 router.get('/public/collections/:id', user.is('auth'), getPublicCollection);
 
+//logged user specific routes
+router.post('/collections', user.is('auth'),  createQuoteCollection);
+router.get('/me/collections', user.is('auth'), listMyCollections);
+router.get('/me/collections/:id', user.is('auth'), getMyQuoteCollection);
+router.put('/me/collections/:id', user.is('auth'), updateMyQuoteCollection);
+router.delete('/me/collections/:id', user.is('auth'), deleteMyQuoteCollection);
+router.post('/me/collections/:id/collaborators', user.is('auth'), addMyCollaborators);
+router.delete('/me/collections/:id/collaborators', user.is('auth'), removeMyCollaborators);
+router.post('/me/collections/:id/quotes', user.is('auth'), addQuoteToMyCollection);
+router.delete('/me/collections/:id/quotes', user.is('auth'), removeQuoteFromMyCollection);
+router.get('/me/collections/:id/quotes', user.is('auth'), listMyCollectionsQuotes);
+
 //role based authorization
 router.get('/collections', user.is('admin'), listQuoteCollections);
-router.get('/collections/:id', user.is('owner or admin'), getQuoteCollection);
-router.put('/collections/:id', user.is('owner or admin'), updateQuoteCollection);
-router.delete('/collections/:id', user.is('owner or admin'), deleteQuoteCollection);
-router.post('/collections/:id/collaborators', user.is('owner or admin'), addNewCollaborators);
-router.delete('/collections/:id/collaborators', user.is('owner or admin'), removeCollaborators);
-router.get('/collections/:id/quotes', user.is('owner or admin'), listCollectionQuotes);
-router.post('/collections/:id/quotes', user.is('owner or admin'), addQuote);
-router.delete('/collections/:id/quotes/:id', user.is('owner or admin'), removeQuote);
+router.get('/collections/:id', user.is('admin'), getQuoteCollection);
+router.put('/collections/:id', user.is('admin'), updateQuoteCollection);
+router.delete('/collections/:id', user.is('admin'), deleteQuoteCollection);
+router.post('/collections/:id/collaborators', user.is('admin'), addCollaborators);
+router.delete('/collections/:id/collaborators', user.is('admin'), removeCollaborators);
+router.get('/collections/:id/collaborators', user.is('admin'), listCollaborators);
+router.post('/collections/:id/quotes', user.is('admin'), addQuoteToCollection);
+router.delete('/collections/:id/quotes', user.is('admin'), removeQuoteFromCollection);
+router.get('/collections/:id/quotes', user.is('admin'), listCollectionQuotes);
 
 module.exports = router;
 
-function listQuoteCollections(req, res, next) {
-  QuoteCollection.find()
-    .then(quoteCollections => res.status(HTTPStatus.OK).send(quoteCollections))
+// -----> Public routes, accessible with any role <------
+
+function listPublicCollections(req, res, next) {
+  const data = { type: 'public' };
+  QuoteCollection.find(data)
+    .then(quoteCollections => {
+      if (!quoteCollections.length) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return res.status(HTTPStatus.OK).send(quoteCollections);
+    })
     .catch(err => next(err));
 }
 
-function listPublicCollections(req, res, next) {
-  QuoteCollection.find({ type: 'public' })
-    .then(quoteCollections => res.status(HTTPStatus.OK).send(quoteCollections))
+function getPublicCollection(req, res, next) {
+  const data = { type: 'public', _id: req.params.id };
+  QuoteCollection.find(data)
+    .then(quoteCollection => {
+      if (!quoteCollection.length) {
+        return res.status(HTTPStatus.NO_CONTENT).send();
+      }
+      return res.status(HTTPStatus.OK).send(quoteCollection);
+    })
+    .catch(err => next(err));
+}
+
+// -----> Logged user specific ('/me') routes <------
+
+function createQuoteCollection(req, res, next) {
+  const collectionData = req.body;
+  collectionData.owner = req.user.id;
+  QuoteCollection.create(collectionData)
+    .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
     .catch(err => next(err));
 }
 
@@ -48,17 +81,107 @@ function listMyCollections(req, res, next) {
     .catch(err => next(err));
 }
 
-function getPublicCollection(req, res, next) {
-  QuoteCollection.findById(req.params.id)
+function getMyQuoteCollection(req, res, next) {
+  const data = { owner: req.user.id, _id: req.params.id };
+  QuoteCollection.findOne(data)
     .then(quoteCollection => {
       if (!quoteCollection) {
         return res.status(HTTPStatus.NO_CONTENT).send();
       }
-      if (quoteCollection.type === 'private') {
-        return res.status(HTTPStatus.UNAUTHORIZED).send();
-      }
       return res.status(HTTPStatus.OK).send(quoteCollection);
     })
+    .catch(err => next(err));
+}
+
+function updateMyQuoteCollection(req, res, next) {
+  const update = dropProperties(req.body, immutables);
+  const data = { owner: req.user.id, _id: req.params.id };
+  QuoteCollection.findOneAndUpdate(data, update, { new: true })
+    .then(quote => res.status(HTTPStatus.OK).send(quote))
+    .catch(err => next(err));
+}
+
+function deleteMyQuoteCollection(req, res, next) {
+  const data = { owner: req.user.id, _id: req.params.id };
+  QuoteCollection.findOneAndRemove(data)
+    .then(() => res.status(HTTPStatus.NO_CONTENT).end())
+    .catch(err => next(err));
+}
+
+function addMyCollaborators(req, res, next) {
+  const collaborator_ids = req.body.collaborator_ids;
+  const data = { owner: req.user.id, _id: req.params.id };
+  QuoteCollection.findOne(data)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.addCollaborators(collaborator_ids)
+        .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection));
+    })
+    .catch(err => next(err));
+}
+
+function removeMyCollaborators(req, res, next) {
+  const collaborator_ids = req.body.collaborator_ids || [];
+  const data = { owner: req.user.id, _id: req.params.id };
+  QuoteCollection.findOne(data)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.removeCollaborators(collaborator_ids)
+        .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection));
+    })
+    .catch(err => next(err));
+}
+
+function addQuoteToMyCollection(req, res, next) {
+  const data = { owner: req.user.id, _id: req.params.id };
+  QuoteCollection.findOne(data)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.addQuote(req.body.quoteId, req.user.id)
+        .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
+        .error(e => res.status(HTTPStatus.BAD_REQUEST).send(e.message));
+      })
+    .catch(err => next(err));
+}
+
+function removeQuoteFromMyCollection(req, res, next) {
+  const data = { owner: req.user.id, _id: req.params.id };
+  QuoteCollection.findOne(data)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.removeQuote(req.body.quoteId, req.user.id)
+        .then(status => res.status(HTTPStatus.OK).send(status))
+        .error((e) => res.status(HTTPStatus.BAD_REQUEST).send(e.message));
+    })
+    .catch(err => next(err));
+}
+
+function listMyCollectionsQuotes(req, res, next) {
+  const data = { owner: req.user.id, _id: req.params.id };
+  QuoteCollection.findOne(data)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.getQuotes()
+        .then(quotes => res.status(HTTPStatus.OK).send(quotes));
+    })
+    .catch(err => next(err));
+}
+
+// -----> Role based routes, admin <------
+
+function listQuoteCollections(req, res, next) {
+  QuoteCollection.find()
+    .then(quoteCollections => res.status(HTTPStatus.OK).send(quoteCollections))
     .catch(err => next(err));
 }
 
@@ -73,11 +196,10 @@ function getQuoteCollection(req, res, next) {
     .catch(err => next(err));
 }
 
-function createQuoteCollection(req, res, next) {
-  const collectionData = req.body;
-  collectionData.owner = req.user.id;
-  QuoteCollection.create(collectionData)
-    .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
+function updateQuoteCollection(req, res, next) {
+  const data = dropProperties(req.body, immutables);
+  QuoteCollection.findOneAndUpdate(req.params.id, data, { new: true })
+    .then(quote => res.status(HTTPStatus.OK).send(quote))
     .catch(err => next(err));
 }
 
@@ -87,48 +209,79 @@ function deleteQuoteCollection(req, res, next) {
     .catch(err => next(err));
 }
 
-function updateQuoteCollection(req, res, next) {
-  const data = dropProperties(req.body, immutables);
-  QuoteCollection.findOneAndUpdate(req.params.id, data, { new: true })
-    .then(quote => res.status(HTTPStatus.OK).send(quote))
+function addQuoteToCollection(req, res, next) {
+  QuoteCollection.findById(req.params.id)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.addQuote(req.body.quoteId, req.user.id)
+        .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
+        .error(e => res.status(HTTPStatus.BAD_REQUEST).send(e.message));
+    })
     .catch(err => next(err));
 }
 
-function addQuote(req, res, next) {
+function removeQuoteFromCollection(req, res, next) {
   QuoteCollection.findById(req.params.id)
-    .then(quoteCollection => quoteCollection.addQuote(req.params.id, req.user.id))
-    .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
-    .error(e => res.status(HTTPStatus.BAD_REQUEST).send(e.message))
-    .catch(err => next(err));
-}
-
-function removeQuote(req, res, next) {
-  QuoteCollection.findById(req.params.id)
-    .then(quoteCollection => quoteCollection.deleteQuotes(req.params.id, req.user.id))
-    .then(status => res.status(HTTPStatus.OK).send(status))
-    .error((e) => res.status(HTTPStatus.BAD_REQUEST).send(e.message))
-    .catch(err => next(err));
-}
-
-function addNewCollaborators(req, res, next) {
-  let collaborator_ids = req.body.collaborator_ids;
-  QuoteCollection.findById(req.params.id)
-    .then(quoteCollection => quoteCollection.addCollaborators(collaborator_ids))
-    .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
-    .catch(err => next(err));
-}
-
-function removeCollaborators(req, res, next) {
-  let collaborator_ids = req.body.collaborator_ids || [];
-  QuoteCollection.findById(req.params.id)
-    .then(quoteCollection => quoteCollection.removeCollaborators(collaborator_ids))
-    .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.removeQuote(req.body.quoteId, req.user.id)
+        .then(status => res.status(HTTPStatus.OK).send(status))
+        .error((e) => res.status(HTTPStatus.BAD_REQUEST).send(e.message));
+    })
     .catch(err => next(err));
 }
 
 function listCollectionQuotes(req, res, next) {
   QuoteCollection.findById(req.params.id)
-    .then(collection => collection.getQuotes())
-    .then(quotes => res.status(HTTPStatus.OK).send(quotes))
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.getQuotes()
+        .then(quotes => res.status(HTTPStatus.OK).send(quotes));
+    })
     .catch(err => next(err));
 }
+
+function addCollaborators(req, res, next) {
+  const collaborator_ids = req.body.collaborator_ids;
+  QuoteCollection.findOne(req.params.id)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.addCollaborators(collaborator_ids)
+        .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection));
+    })
+    .catch(err => next(err));
+}
+
+function removeCollaborators(req, res, next) {
+  const collaborator_ids = req.body.collaborator_ids || [];
+  QuoteCollection.findById(req.params.id)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.removeCollaborators(collaborator_ids)
+        .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection));
+    })
+    .catch(err => next(err));
+}
+
+function listCollaborators(req, res, next) {
+  QuoteCollection.findById(req.params.id)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.getCollaborators()
+        .then(collaborators => res.status(HTTPStatus.OK).send(collaborators));
+    })
+    .catch(err => next(err));
+}
+
