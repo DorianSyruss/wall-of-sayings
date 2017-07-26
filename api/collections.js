@@ -55,9 +55,9 @@ function listPublicCollections(req, res, next) {
 
 function getPublicCollection(req, res, next) {
   const data = { type: 'public', _id: req.params.id };
-  QuoteCollection.find(data)
+  QuoteCollection.findOne(data)
     .then(quoteCollection => {
-      if (!quoteCollection.length) {
+      if (!quoteCollection) {
         return res.status(HTTPStatus.NO_CONTENT).send();
       }
       return res.status(HTTPStatus.OK).send(quoteCollection);
@@ -86,7 +86,7 @@ function getMyQuoteCollection(req, res, next) {
   QuoteCollection.findOne(data)
     .then(quoteCollection => {
       if (!quoteCollection) {
-        return res.status(HTTPStatus.NO_CONTENT).send();
+        return res.status(HTTPStatus.NO_CONTENT).end();
       }
       return res.status(HTTPStatus.OK).send(quoteCollection);
     })
