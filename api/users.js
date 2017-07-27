@@ -5,16 +5,17 @@ const router = require('express').Router();
 const User = require('../models/user');
 const dropProperties = require('lodash/omit');
 const { user } = require('../auth/permissions');
+const { hash } = require('../models/helpers');
 
 //props to omit for this data model, safety measure
 const immutables = ['role'];
 
 //guest routes
-router.post('/guest/signup', createUser);
+router.post('/guest/signup', hashPassword, createUser);
 
 //logged user specific routes
 router.get('/me/profile', user.is('auth'), getMyProfile);
-router.put('/me/profile', user.is('auth'), updateMyProfile);
+router.put('/me/profile', user.is('auth'), hashPassword, updateMyProfile);
 router.delete('/me/profile/', user.is('auth'), deleteMyProfile);
 
 //accessible with any role
@@ -24,7 +25,7 @@ router.get('/public/users/:id', user.is('auth'), getPublicUser);
 //role based authorization
 router.get('/users', user.is('admin'), listUsers);
 router.get('/users/:id', user.is('admin'), getUser);
-router.put('/users/:id', user.is('admin'), updateUser);
+router.put('/users/:id', user.is('admin'), hashPassword, updateUser);
 router.delete('/users/:id', user.is('admin'), deleteUser);
 
 module.exports = router;
@@ -134,3 +135,16 @@ function deleteUser(req, res, next) {
     .catch(err => next(err));
 }
 
+// -----> Helper middleware for password hashing <------
+
+function hashPassword(req, res, next) {
+  const password = req.body.password;
+  if (!password) {
+    return next();
+  }
+
+  hash(password).then(hash => {
+    req.body.password = hash;
+    next();
+  });
+}

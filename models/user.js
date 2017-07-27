@@ -5,8 +5,6 @@ const mongoose = require('mongoose');
 const helpers = require('./helpers');
 const { Schema } = mongoose;
 
-const SALT_WORK_FACTOR = 8;
-
 const Role = {
   Admin: 0,
   User: 1,
@@ -29,19 +27,6 @@ const User = new Schema({
   email: { type: String, unique: true },
   password: String,
   role: { type: Number, default: Role.User, validate: Role.isValid }
-});
-
-User.pre('save', function (next) {
-  if (!this.isModified('password')) next();
-
-  bcrypt.genSalt(SALT_WORK_FACTOR, (err, salt) => {
-    if (err) return next(err);
-    bcrypt.hash(this.password, salt, (err, hash) => {
-      if (err) return next(err);
-      this.password = hash;
-      next();
-    });
-  });
 });
 
 Object.assign(User.query, helpers);
