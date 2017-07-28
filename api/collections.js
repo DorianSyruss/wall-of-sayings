@@ -42,8 +42,8 @@ module.exports = router;
 // -----> Public routes, accessible with any role <------
 
 function listPublicCollections(req, res, next) {
-  const data = { type: 'public' };
-  QuoteCollection.find(data)
+  const query = { type: 'public' };
+  QuoteCollection.find(query)
     .then(quoteCollections => {
       if (!quoteCollections.length) {
         return res.status(HTTPStatus.NO_CONTENT).end();
@@ -54,8 +54,8 @@ function listPublicCollections(req, res, next) {
 }
 
 function getPublicCollection(req, res, next) {
-  const data = { type: 'public', _id: req.params.id };
-  QuoteCollection.findOne(data)
+  const query = { type: 'public', _id: req.params.id };
+  QuoteCollection.findOne(query)
     .then(quoteCollection => {
       if (!quoteCollection) {
         return res.status(HTTPStatus.NO_CONTENT).send();
@@ -82,8 +82,8 @@ function listMyCollections(req, res, next) {
 }
 
 function getMyQuoteCollection(req, res, next) {
-  const data = { owner: req.user.id, _id: req.params.id };
-  QuoteCollection.findOne(data)
+  const query = { owner: req.user.id, _id: req.params.id };
+  QuoteCollection.findOne(query)
     .then(quoteCollection => {
       if (!quoteCollection) {
         return res.status(HTTPStatus.NO_CONTENT).end();
@@ -95,23 +95,23 @@ function getMyQuoteCollection(req, res, next) {
 
 function updateMyQuoteCollection(req, res, next) {
   const update = dropProperties(req.body, immutables);
-  const data = { owner: req.user.id, _id: req.params.id };
-  QuoteCollection.findOneAndUpdate(data, update, { new: true })
+  const query = { owner: req.user.id, _id: req.params.id };
+  QuoteCollection.findOneAndUpdate(query, update, { new: true })
     .then(quote => res.status(HTTPStatus.OK).send(quote))
     .catch(err => next(err));
 }
 
 function deleteMyQuoteCollection(req, res, next) {
-  const data = { owner: req.user.id, _id: req.params.id };
-  QuoteCollection.findOneAndRemove(data)
+  const query = { owner: req.user.id, _id: req.params.id };
+  QuoteCollection.findOneAndRemove(query)
     .then(() => res.status(HTTPStatus.NO_CONTENT).end())
     .catch(err => next(err));
 }
 
 function addMyCollaborators(req, res, next) {
   const collaborator_ids = req.body.collaborator_ids;
-  const data = { owner: req.user.id, _id: req.params.id };
-  QuoteCollection.findOne(data)
+  const query = { owner: req.user.id, _id: req.params.id };
+  QuoteCollection.findOne(query)
     .then(quoteCollection => {
       if (!quoteCollection) {
         return res.status(HTTPStatus.NO_CONTENT).end();
@@ -124,8 +124,8 @@ function addMyCollaborators(req, res, next) {
 
 function removeMyCollaborators(req, res, next) {
   const collaborator_ids = req.body.collaborator_ids || [];
-  const data = { owner: req.user.id, _id: req.params.id };
-  QuoteCollection.findOne(data)
+  const query = { owner: req.user.id, _id: req.params.id };
+  QuoteCollection.findOne(query)
     .then(quoteCollection => {
       if (!quoteCollection) {
         return res.status(HTTPStatus.NO_CONTENT).end();
@@ -137,8 +137,8 @@ function removeMyCollaborators(req, res, next) {
 }
 
 function addQuoteToMyCollection(req, res, next) {
-  const data = { owner: req.user.id, _id: req.params.id };
-  QuoteCollection.findOne(data)
+  const query = { owner: req.user.id, _id: req.params.id };
+  QuoteCollection.findOne(query)
     .then(quoteCollection => {
       if (!quoteCollection) {
         return res.status(HTTPStatus.NO_CONTENT).end();
@@ -151,8 +151,8 @@ function addQuoteToMyCollection(req, res, next) {
 }
 
 function removeQuoteFromMyCollection(req, res, next) {
-  const data = { owner: req.user.id, _id: req.params.id };
-  QuoteCollection.findOne(data)
+  const query = { owner: req.user.id, _id: req.params.id };
+  QuoteCollection.findOne(query)
     .then(quoteCollection => {
       if (!quoteCollection) {
         return res.status(HTTPStatus.NO_CONTENT).end();
@@ -165,8 +165,8 @@ function removeQuoteFromMyCollection(req, res, next) {
 }
 
 function listMyCollectionsQuotes(req, res, next) {
-  const data = { owner: req.user.id, _id: req.params.id };
-  QuoteCollection.findOne(data)
+  const query = { owner: req.user.id, _id: req.params.id };
+  QuoteCollection.findOne(query)
     .then(quoteCollection => {
       if (!quoteCollection) {
         return res.status(HTTPStatus.NO_CONTENT).end();

@@ -17,4 +17,3 @@ const auth = new LocalStrategy((username, password, done) => {
 });
 
 module.exports = auth;
-

@@ -17,8 +17,4 @@ function hash(password) {
   return bcrypt.hash(password, SALT_WORK_FACTOR);
 }
 
-function compare(newPassword, oldPassword) {
-  return bcrypt.compare(newPassword, oldPassword);
-}
-
-module.exports = { omit, pick, hash, compare };
+module.exports = { omit, pick, hash };
