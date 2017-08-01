@@ -9,10 +9,11 @@ const quote = new Schema({
   author: String,
   type: String,
   owner: ObjectId,
+  tags: [String],
   favoritedCount: Number,
   favoritedBy: [ObjectId],
   publishedOn: Date
-});
+}, { timestamps: { createdAt: 'created_at' } });
 
 Object.assign(quote.methods, {
   getAuthor() {
@@ -31,6 +32,11 @@ Object.assign(quote.methods, {
 
   countFavorites() {
     return this.favoritedCount = this.favoritedBy.length;
+  },
+
+  trackPublishing(type) {
+    if (type !== 'public') return;
+    this.publishedOn = new Date;
   }
 });
 

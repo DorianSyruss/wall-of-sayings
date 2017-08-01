@@ -23,10 +23,10 @@ router.get('/public/users', user.is('auth'), listPublicUsers);
 router.get('/public/users/:id', user.is('auth'), getPublicUser);
 
 //role based authorization
-router.get('/users', user.is('admin'), listUsers);
-router.get('/users/:id', user.is('admin'), getUser);
-router.put('/users/:id', user.is('admin'), hashPassword, updateUser);
-router.delete('/users/:id', user.is('admin'), deleteUser);
+router.get('/users', user.is('auth'), user.is('admin'), listUsers);
+router.get('/users/:id', user.is('auth'), user.is('admin'), getUser);
+router.put('/users/:id', user.is('auth'), user.is('admin'), hashPassword, updateUser);
+router.delete('/users/:id', user.is('auth'), user.is('admin'), deleteUser);
 
 module.exports = router;
 

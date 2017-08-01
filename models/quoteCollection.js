@@ -13,7 +13,7 @@ const quoteCollection = new Schema({
   type: String,
   quotes: [ObjectId],
   collaborators: [ObjectId]
-});
+}, { timestamps: { createdAt: 'created_at' } });
 
 Object.assign(quoteCollection.methods, {
 

@@ -26,16 +26,16 @@ router.delete('/me/collections/:id/quotes', user.is('auth'), removeQuoteFromMyCo
 router.get('/me/collections/:id/quotes', user.is('auth'), listMyCollectionsQuotes);
 
 //role based authorization
-router.get('/collections', user.is('admin'), listQuoteCollections);
-router.get('/collections/:id', user.is('admin'), getQuoteCollection);
-router.put('/collections/:id', user.is('admin'), updateQuoteCollection);
-router.delete('/collections/:id', user.is('admin'), deleteQuoteCollection);
-router.post('/collections/:id/collaborators', user.is('admin'), addCollaborators);
-router.delete('/collections/:id/collaborators', user.is('admin'), removeCollaborators);
-router.get('/collections/:id/collaborators', user.is('admin'), listCollaborators);
-router.post('/collections/:id/quotes', user.is('admin'), addQuoteToCollection);
-router.delete('/collections/:id/quotes', user.is('admin'), removeQuoteFromCollection);
-router.get('/collections/:id/quotes', user.is('admin'), listCollectionQuotes);
+router.get('/collections', user.is('auth'), user.is('admin'), listQuoteCollections);
+router.get('/collections/:id', user.is('auth'), user.is('admin'), getQuoteCollection);
+router.put('/collections/:id', user.is('auth'), user.is('admin'), updateQuoteCollection);
+router.delete('/collections/:id', user.is('auth'), user.is('admin'), deleteQuoteCollection);
+router.post('/collections/:id/collaborators', user.is('auth'), user.is('admin'), addCollaborators);
+router.delete('/collections/:id/collaborators', user.is('auth'), user.is('admin'), removeCollaborators);
+router.get('/collections/:id/collaborators', user.is('auth'), user.is('admin'), listCollaborators);
+router.post('/collections/:id/quotes', user.is('auth'), user.is('admin'), addQuoteToCollection);
+router.delete('/collections/:id/quotes', user.is('auth'), user.is('admin'), removeQuoteFromCollection);
+router.get('/collections/:id/quotes', user.is('auth'), user.is('admin'), listCollectionQuotes);
 
 module.exports = router;
 

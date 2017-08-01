@@ -3,30 +3,35 @@
     "quote": "was is das1",
     "author": "John Doe",
     "type:": "public",
-    "favoritedCount": 0
+    "favoritedCount": 0,
+    "tags": ["science", "philosophy"]
   },
   {
     "quote": "was is das2",
     "author": "John Doe",
     "type": "public",
-    "favoritedCount": 0
+    "favoritedCount": 0,
+    "tags": ["science", "philosophy"]
   },
   {
     "quote": "was is das3",
     "author": "Jane Doe",
     "type": "public",
-    "favoritedCount": 0
+    "favoritedCount": 0,
+    "tags": ["science", "philosophy"]
   },
   {
     "quote": "was is das4",
     "author": "Jane Doe",
     "type": "public",
-    "favoritedCount": 0
+    "favoritedCount": 0,
+    "tags": ["politcs", "philosophy"]
   },
   {
     "quote": "was is das5",
     "author": "Jane Doe",
     "type": "private",
-    "favoritedCount": 0
+    "favoritedCount": 0,
+    "tags": ["religion", "philosophy"]
   }
 ]

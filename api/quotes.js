@@ -23,11 +23,11 @@ router.delete('/me/quotes/:id', user.is('auth'), deleteMyQuote);
 //accessible with any role
 
 //role based authorization
-router.get('/quotes', user.is('admin'), listQuotes);
-router.post('/quotes', user.is('admin'), createQuote);
-router.get('/quotes/:id', user.is('admin'), getQuote);
-router.put('/quotes/:id', user.is('admin'), updateQuote);
-router.delete('/quotes/:id', user.is('admin'), deleteQuote);
+router.get('/quotes', user.is('auth'), user.is('admin'), listQuotes);
+router.post('/quotes', user.is('auth'), user.is('admin'), createQuote);
+router.get('/quotes/:id', user.is('auth'), user.is('admin'), getQuote);
+router.put('/quotes/:id', user.is('auth'), user.is('admin'), updateQuote);
+router.delete('/quotes/:id', user.is('auth'), user.is('admin'), deleteQuote);
 
 module.exports = router;
 
@@ -147,7 +147,10 @@ function getQuote(req, res, next) {
 function updateQuote(req, res, next) {
   const data = dropProperties(req.body, immutables);
   Quote.findOneAndUpdate(req.params.id, data, { new: true })
-    .then(quote => res.status(HTTPStatus.OK).send(quote))
+    .then(quote => {
+      quote.trackPublishing(quote.type);
+      res.status(HTTPStatus.OK).send(quote);
+    })
     .catch(err => next(err));
 }
 

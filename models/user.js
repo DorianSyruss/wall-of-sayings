@@ -27,7 +27,7 @@ const User = new Schema({
   email: { type: String, unique: true },
   password: String,
   role: { type: Number, default: Role.User, validate: Role.isValid }
-});
+}, { timestamps: { createdAt: 'created_at' } });
 
 Object.assign(User.query, helpers);
 
