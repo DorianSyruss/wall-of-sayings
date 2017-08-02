@@ -1,6 +1,7 @@
 'use strict';
 
 require('dotenv').config();
+const { hash } = require('../models/helpers');
 const random = require('lodash/random');
 const times = require('lodash/times');
 const uniqBy = require('lodash/uniqBy');
@@ -55,10 +56,31 @@ function addQuotes(collection, quotes, quoteCount=4) {
   collection.quotes.push(...unique(selectedQuotes));
 }
 
+function hashPasswordProp(user) {
+  return hash(user.password).then(hashed => {
+    user.password = hashed;
+    return user;
+  });
+}
+
+function* hashUsersPasswords(users) {
+  yield* users.map(user => (user.password ? hashPasswordProp(user) : Promise.resolve(user)));
+}
+
+function isUserArray(arr) {
+  return arr.some(item => item.password);
+}
+
 function seed(Model, name, data) {
   console.log(`Seeding ${name.toLowerCase()}s...`);
   return Model.remove(data)
-    .then(() => Model.create(data))
+    .then(() => (isUserArray(data) ? Promise.all(hashUsersPasswords(data)) : Promise.resolve(data)))
+    .then(data => Model.create(data))
+    .then(models => {
+      console.log(`${name}s created...`);
+      return models;
+    })
+
     .then(models => {
       console.log(`${name}s created...`);
       return models;

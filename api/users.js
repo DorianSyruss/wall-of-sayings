@@ -24,7 +24,7 @@ router.get('/public/users/:id', user.is('auth'), getPublicUser);
 
 //role based authorization
 router.get('/users', user.is('auth'), user.is('admin'), listUsers);
-router.get('/users/:id', user.is('auth'), user.is('admin'), getUser);
+router.get('/users/:id', user.is('admin'), getUser);
 router.put('/users/:id', user.is('auth'), user.is('admin'), hashPassword, updateUser);
 router.delete('/users/:id', user.is('auth'), user.is('admin'), deleteUser);
 
