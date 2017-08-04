@@ -8,10 +8,10 @@ const auth = new LocalStrategy((username, password, done) => {
     if (err) return done(err);
     if (!user) return done(null, false, { message: 'Incorrect username.' });
     user.validPassword(password, (err, valid) => {
-        if (err || !valid) {
-          return done(null, false, { message: 'Incorrect password.' });
-        }
-        return done(null, user);
+      if (err || !valid) {
+        return done(null, false, { message: 'Incorrect password.' });
+      }
+      return done(null, user);
     });
   });
 });

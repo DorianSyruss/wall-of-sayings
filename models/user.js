@@ -20,7 +20,7 @@ const Role = {
 };
 
 const User = new Schema({
-  facebook_id: Number,
+  facebookId: String,
   name: String,
   surname: String,
   gender: String,

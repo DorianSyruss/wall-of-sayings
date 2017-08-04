@@ -94,6 +94,7 @@ function getMyQuoteCollection(req, res, next) {
 }
 
 function updateMyQuoteCollection(req, res, next) {
+  const immutables = ['owner', 'quotes'];
   const update = dropProperties(req.body, immutables);
   const query = { owner: req.user.id, _id: req.params.id };
   QuoteCollection.findOneAndUpdate(query, update, { new: true })

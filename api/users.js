@@ -8,7 +8,7 @@ const { user } = require('../auth/permissions');
 const { hash } = require('../models/helpers');
 
 //props to omit for this data model, safety measure
-const immutables = ['role'];
+const immutables = ['role', 'facebookId'];
 
 //guest routes
 router.post('/guest/signup', hashPassword, createUser);

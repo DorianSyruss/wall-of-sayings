@@ -17,7 +17,7 @@ function authorize(accessToken, refreshToken, profile, done) {
   let facebookId = profile.id;
   let email = getProp(profile, 'emails[0].value');
 
-  let query = { facebookId } || { email };
+  let query = { email } || { facebookId } ;
   User.findOne(query, (err, user) => {
     if (err) return done(err);
     if (user) return done(null, user);
