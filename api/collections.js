@@ -8,10 +8,13 @@ const { user } = require('../auth/permissions');
 
 //props to omit for this data model, safety measure
 const immutables = ['owner'];
+const defaultLimit = 50;
 
 //accessible with any role
 router.get('/public/collections', user.is('auth'), listPublicCollections);
 router.get('/public/collections/:id', user.is('auth'), getPublicCollection);
+router.get('/public/collections/:id/quotes', user.is('auth'), listPublicCollectionQuotes);
+router.get('/public/collections/:id/collaborators', user.is('auth'), listPublicCollectionCollaborators);
 
 //logged user specific routes
 router.post('/collections', user.is('auth'),  createQuoteCollection);
@@ -21,9 +24,10 @@ router.put('/me/collections/:id', user.is('auth'), updateMyQuoteCollection);
 router.delete('/me/collections/:id', user.is('auth'), deleteMyQuoteCollection);
 router.post('/me/collections/:id/collaborators', user.is('auth'), addMyCollaborators);
 router.delete('/me/collections/:id/collaborators', user.is('auth'), removeMyCollaborators);
+router.get('/me/collections/:id/collaborators', user.is('auth'), listMyCollaborators);
 router.post('/me/collections/:id/quotes', user.is('auth'), addQuoteToMyCollection);
 router.delete('/me/collections/:id/quotes', user.is('auth'), removeQuoteFromMyCollection);
-router.get('/me/collections/:id/quotes', user.is('auth'), listMyCollectionsQuotes);
+router.get('/me/collections/:id/quotes', user.is('auth'), listMyCollectionQuotes);
 
 //role based authorization
 router.get('/collections', user.is('auth'), user.is('admin'), listQuoteCollections);
@@ -43,7 +47,11 @@ module.exports = router;
 
 function listPublicCollections(req, res, next) {
   const query = { type: 'public' };
+  const offset = parseInt(req.query.offset, 10) || 0;
+  const limit = parseInt(req.query.limit, 10) || defaultLimit;
   QuoteCollection.find(query)
+    .skip(offset)
+    .limit(limit)
     .then(quoteCollections => {
       if (!quoteCollections.length) {
         return res.status(HTTPStatus.NO_CONTENT).end();
@@ -65,6 +73,32 @@ function getPublicCollection(req, res, next) {
     .catch(err => next(err));
 }
 
+function listPublicCollectionQuotes(req, res, next) {
+  const query = { type: 'public', _id: req.params.id };
+  QuoteCollection.findOne(query)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.getQuotes()
+        .then(quotes => res.status(HTTPStatus.OK).send(quotes));
+    })
+    .catch(err => next(err));
+}
+
+function listPublicCollectionCollaborators(req, res, next) {
+  const query = { type: 'public', _id: req.params.id };
+  QuoteCollection.findById(query)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.getCollaborators()
+        .then(collaborators => res.status(HTTPStatus.OK).send(collaborators));
+    })
+    .catch(err => next(err));
+}
+
 // -----> Logged user specific ('/me') routes <------
 
 function createQuoteCollection(req, res, next) {
@@ -76,7 +110,11 @@ function createQuoteCollection(req, res, next) {
 }
 
 function listMyCollections(req, res, next) {
+  const offset = parseInt(req.query.offset, 10) || 0;
+  const limit = parseInt(req.query.limit, 10) || defaultLimit;
   QuoteCollection.find({ owner: req.user.id })
+    .skip(offset)
+    .limit(limit)
     .then(quoteCollections => res.status(HTTPStatus.OK).send(quoteCollections))
     .catch(err => next(err));
 }
@@ -137,6 +175,19 @@ function removeMyCollaborators(req, res, next) {
     .catch(err => next(err));
 }
 
+function listMyCollaborators(req, res, next) {
+  const query = { owner: req.user.id, _id: req.params.id };
+  QuoteCollection.findById(query)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.getCollaborators()
+        .then(collaborators => res.status(HTTPStatus.OK).send(collaborators));
+    })
+    .catch(err => next(err));
+}
+
 function addQuoteToMyCollection(req, res, next) {
   const query = { owner: req.user.id, _id: req.params.id };
   QuoteCollection.findOne(query)
@@ -165,7 +216,7 @@ function removeQuoteFromMyCollection(req, res, next) {
     .catch(err => next(err));
 }
 
-function listMyCollectionsQuotes(req, res, next) {
+function listMyCollectionQuotes(req, res, next) {
   const query = { owner: req.user.id, _id: req.params.id };
   QuoteCollection.findOne(query)
     .then(quoteCollection => {
@@ -181,7 +232,11 @@ function listMyCollectionsQuotes(req, res, next) {
 // -----> Role based routes, admin <------
 
 function listQuoteCollections(req, res, next) {
+  const offset = parseInt(req.query.offset, 10) || 0;
+  const limit = parseInt(req.query.limit, 10) || defaultLimit;
   QuoteCollection.find()
+    .skip(offset)
+    .limit(limit)
     .then(quoteCollections => res.status(HTTPStatus.OK).send(quoteCollections))
     .catch(err => next(err));
 }

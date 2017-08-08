@@ -8,6 +8,7 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const HTTPStatus = require('http-status');
 const { db, dbUri } = require('./db');
+const MongooseError = require('mongoose').Error;
 const app = express();
 const { user } = require('./auth/permissions');
 
@@ -33,6 +34,11 @@ require('./api')(app);
 
 // global error handler
 app.use((err, req, res, next) => {
+  const isValidationError = err instanceof MongooseError && err.name === 'ValidationError';
+
+  if (isValidationError) {
+    return res.status(HTTPStatus.BAD_REQUEST).json({ error: err.message });
+  }
   res.status(HTTPStatus.INTERNAL_SERVER_ERROR).json({ error: err.message });
 });
 

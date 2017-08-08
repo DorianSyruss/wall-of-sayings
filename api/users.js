@@ -9,6 +9,7 @@ const { hash } = require('../models/helpers');
 
 //props to omit for this data model, safety measure
 const immutables = ['role', 'facebookId'];
+const defaultLimit = 50;
 
 //guest routes
 router.post('/guest/signup', hashPassword, createUser);
@@ -48,7 +49,12 @@ function createUser(req, res, next) {
 
 function listPublicUsers(req, res, next) {
   const privateData = ['email', 'password'];
-  User.find().omit(privateData)
+  const offset = parseInt(req.query.offset, 10) || 0;
+  const limit = parseInt(req.query.limit, 10) || defaultLimit;
+  User.find()
+    .skip(offset)
+    .limit(limit)
+    .omit(privateData)
     .then(users => {
       if (!users.length) {
         return res.status(HTTPStatus.NO_CONTENT).end();
@@ -95,7 +101,12 @@ function deleteMyProfile(req, res, next) {
 
 function listUsers(req, res, next) {
   const privateData = ['password'];
-  User.find().omit(privateData)
+  const offset = parseInt(req.query.offset, 10) || 0;
+  const limit = parseInt(req.query.limit, 10) || defaultLimit;
+  User.find()
+    .skip(offset)
+    .limit(limit)
+    .omit(privateData)
     .then(users => {
       if (!users.length) {
         return res.status(HTTPStatus.NO_CONTENT).end();

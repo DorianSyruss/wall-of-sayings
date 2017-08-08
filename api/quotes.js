@@ -8,6 +8,7 @@ const { user } = require('../auth/permissions');
 
 //props to omit for this data model, safety measure
 const immutables = ['owner', 'favoritedCount', 'favoritedBy', 'publishedOn'];
+const defaultLimit = 50;
 
 //guest routes
 router.get('/guest/quotes', listPublicQuotes);
@@ -34,7 +35,11 @@ module.exports = router;
 // -----> Guest routes, no login needed <------
 
 function listPublicQuotes(req, res, next) {
+  const offset = parseInt(req.query.offset, 10) || 0;
+  const limit = parseInt(req.query.limit, 10) || defaultLimit;
   Quote.find({ type: 'public' })
+    .skip(offset)
+    .limit(limit)
     .then(quotes => {
       if (!quotes.length) {
         return res.status(HTTPStatus.NO_CONTENT).end();
@@ -70,7 +75,11 @@ function createMyQuote(req, res, next) {
 }
 
 function listMyQuotes(req, res, next) {
+  const offset = parseInt(req.query.offset, 10) || 0;
+  const limit = parseInt(req.query.limit, 10) || defaultLimit;
   Quote.find({ owner: req.user.id })
+    .skip(offset)
+    .limit(limit)
     .then(quotes => {
       if (!quotes.length) {
         return res.status(HTTPStatus.NO_CONTENT).end();
@@ -123,7 +132,11 @@ function createQuote(req, res, next) {
 }
 
 function listQuotes(req, res, next) {
+  const offset = parseInt(req.query.offset, 10) || 0;
+  const limit = parseInt(req.query.limit, 10) || defaultLimit;
   Quote.find()
+    .skip(offset)
+    .limit(limit)
     .then(quotes => {
       if (!quotes.length) {
         return res.status(HTTPStatus.NO_CONTENT).end();

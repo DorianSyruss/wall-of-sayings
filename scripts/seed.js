@@ -80,7 +80,6 @@ function seed(Model, name, data) {
       console.log(`${name}s created...`);
       return models;
     })
-
     .then(models => {
       console.log(`${name}s created...`);
       return models;
