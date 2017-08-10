@@ -4,20 +4,21 @@ const HTTPStatus = require('http-status');
 const router = require('express').Router();
 const User = require('../models/user');
 const dropProperties = require('lodash/omit');
+const get = require('lodash/get');
 const { user } = require('../auth/permissions');
-const { hash } = require('../models/helpers');
 
 //props to omit for this data model, safety measure
 const immutables = ['role', 'facebookId'];
 const defaultLimit = 50;
 
 //guest routes
-router.post('/guest/signup', hashPassword, createUser);
+router.post('/guest/signup', createUser);
 
 //logged user specific routes
 router.get('/me/profile', user.is('auth'), getMyProfile);
-router.put('/me/profile', user.is('auth'), hashPassword, updateMyProfile);
+router.put('/me/profile', user.is('auth'), updateMyProfile);
 router.delete('/me/profile/', user.is('auth'), deleteMyProfile);
+router.put('/me/profile/resetPassword', user.is('auth'), resetPassword);
 
 //accessible with any role
 router.get('/public/users', user.is('auth'), listPublicUsers);
@@ -26,7 +27,7 @@ router.get('/public/users/:id', user.is('auth'), getPublicUser);
 //role based authorization
 router.get('/users', user.is('auth'), user.is('admin'), listUsers);
 router.get('/users/:id', user.is('admin'), getUser);
-router.put('/users/:id', user.is('auth'), user.is('admin'), hashPassword, updateUser);
+router.put('/users/:id', user.is('auth'), user.is('admin'), updateUser);
 router.delete('/users/:id', user.is('auth'), user.is('admin'), deleteUser);
 
 module.exports = router;
@@ -40,6 +41,10 @@ function createUser(req, res, next) {
     .catch(err => {
       if (err.code === 11000) {
         return res.status(HTTPStatus.CONFLICT).json('User already exists');
+      }
+      const message = get(err, 'errors.password.message');
+      if (message) {
+        return res.status(HTTPStatus.BAD_REQUEST).json({ error: message });
       }
       return next(err);
     });
@@ -85,7 +90,7 @@ function getMyProfile(req, res, next) {
 }
 
 function updateMyProfile(req, res, next) {
-  const update = dropProperties(req.body, immutables);
+  const update = dropProperties(req.body, [ ...immutables, 'password']);
   User.findByIdAndUpdate(req.user.id, update, { new: true })
     .then(user => res.status(HTTPStatus.OK).send(user))
     .catch(err => next(err));
@@ -95,6 +100,21 @@ function deleteMyProfile(req, res, next) {
   User.findByIdAndRemove(req.user.id)
     .then(() => res.status(HTTPStatus.NO_CONTENT).end())
     .catch(err => next(err));
+}
+
+function resetPassword(req, res, next) {
+  User.findById(req.user.id)
+    .then(user => {
+      return user.updatePassword(req.body.password);
+    })
+    .then(() => res.status(HTTPStatus.NO_CONTENT).end())
+    .catch(err => {
+      const message = get(err, 'errors.password.message');
+      if (message) {
+        return res.status(HTTPStatus.BAD_REQUEST).json({ error: message });
+      }
+      next(err);
+    });
 }
 
 // -----> Role based routes, admin <------
@@ -146,16 +166,3 @@ function deleteUser(req, res, next) {
     .catch(err => next(err));
 }
 
-// -----> Helper middleware for password hashing <------
-
-function hashPassword(req, res, next) {
-  const password = req.body.password;
-  if (!password) {
-    return next();
-  }
-
-  hash(password).then(hash => {
-    req.body.password = hash;
-    next();
-  });
-}

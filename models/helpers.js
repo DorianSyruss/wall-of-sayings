@@ -2,6 +2,7 @@
 
 const bcrypt = require('bcrypt');
 const SALT_WORK_FACTOR = 8;
+const passwordValidator = require('password-validator');
 
 function pick(props = []) {
   const include = props.map(prop => `${prop}`).join(' ');
@@ -17,4 +18,15 @@ function hash(password) {
   return bcrypt.hash(password, SALT_WORK_FACTOR);
 }
 
-module.exports = { omit, pick, hash };
+//password validation
+const passwordSchema = new passwordValidator();
+passwordSchema
+  .is().min(8)  // Minimum length 8
+  .is().max(100) // Maximum length 100
+  .has().uppercase() // Must have uppercase letters
+  .has().lowercase() // Must have lowercase letters
+  .has().digits() // Must have digits
+  .has().not().spaces() // Should not have spaces
+  .is().not().oneOf(['Password', 'password', 'password123']); // Blacklist these values
+
+module.exports = { omit, pick, hash, passwordSchema };

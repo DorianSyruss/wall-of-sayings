@@ -26,18 +26,45 @@ const User = new Schema({
     required: true,
     minlength: 2
   },
-  surname: String,
+  surname: {
+    type: String,
+    required: true,
+    minlength: 2
+  },
   gender: String,
   email: { type: String, unique: true },
-  password: String,
+  password: {
+    type: String,
+    required: true,
+    validate: {
+      message: 'Password validation failed.',
+      validator(password) {
+        return helpers.passwordSchema.validate(password);
+      }
+    }
+  },
   role: { type: Number, default: Role.User, validate: Role.isValid }
 }, { timestamps: { createdAt: 'created_at' } });
+
+User.pre('save', function (next) {
+  if (!this.isModified('password')) next();
+
+  helpers.hash(this.password)
+    .then(hash => this.password = hash)
+    .then(() => next())
+    .catch(err => next(err));
+});
 
 Object.assign(User.query, helpers);
 
 Object.assign(User.methods, {
   getFullName() {
     return `${this.name} ${this.surname}`;
+  },
+
+  updatePassword(password) {
+    this.password = password;
+    return this.save();
   },
 
   validPassword(password, cb) {
