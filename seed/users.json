@@ -1,34 +1,39 @@
 [
   {
     "name": "ante1",
+    "surname" : "franic1",
     "username": "antic1",
     "gender": "male",
     "email": "mali@ante1.com",
-    "password": "jedan"
+    "password": "Jedan123"
   },
   {
     "name": "ante2",
+    "surname" : "franic2",
     "username": "antic2",
     "gender": "male",
     "email": "mali@ante2.com",
-    "password": "dva"
+    "password": "Dva12345"
   },
   {
     "name": "ante3",
+    "surname" : "franic3",
     "username": "antic3",
     "email": "mali@ante3.com",
-    "password": "tri"
+    "password": "Tri12345"
   },
   {
     "name": "ante4",
+    "surname" : "franic4",
     "username": "antic4",
     "email": "mali@ante4.com",
-    "password": "cetiri"
+    "password": "Cetiri12"
   },
   {
     "name": "ante5",
+    "surname" : "franic5",
     "username": "antic5",
     "email": "mali@ante5.com",
-    "password": "pet"
+    "password": "Pet12345"
   }
 ]

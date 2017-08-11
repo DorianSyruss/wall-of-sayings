@@ -105,9 +105,9 @@ function deleteMyProfile(req, res, next) {
 function resetPassword(req, res, next) {
   User.findById(req.user.id)
     .then(user => {
-      return user.updatePassword(req.body.password);
+      return user.updatePassword(req.body.oldPassword, req.body.password);
     })
-    .then(() => res.status(HTTPStatus.NO_CONTENT).end())
+    .then(() => res.status(HTTPStatus.NO_CONTENT).send())
     .catch(err => {
       const message = get(err, 'errors.password.message');
       if (message) {
@@ -150,7 +150,8 @@ function getUser(req, res, next) {
 
 function updateUser(req, res, next) {
   const privateData = ['password'];
-  User.findByIdAndUpdate(req.params.id, req.body, { new: true }).omit(privateData)
+  const update = dropProperties(req.body, privateData);
+  User.findByIdAndUpdate(req.params.id, update, { new: true }).omit(privateData)
     .then(user => {
       if (!user) {
         return res.status(HTTPStatus.NO_CONTENT).end();

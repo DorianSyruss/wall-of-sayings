@@ -21,18 +21,14 @@ const Role = {
 
 const User = new Schema({
   facebookId: String,
-  name: {
-    type: String,
-    required: true,
-    minlength: 2
-  },
-  surname: {
-    type: String,
-    required: true,
-    minlength: 2
-  },
+  name: { type: String, required: true, minlength: 2 },
+  surname: { type: String, required: true, minlength: 2 },
   gender: String,
-  email: { type: String, unique: true },
+  email: {
+    type: String,
+    unique: true,
+    required: true
+  },
   password: {
     type: String,
     required: true,
@@ -62,13 +58,18 @@ Object.assign(User.methods, {
     return `${this.name} ${this.surname}`;
   },
 
-  updatePassword(password) {
-    this.password = password;
-    return this.save();
+  updatePassword(oldPassword, password) {
+    return this.validPassword(oldPassword, (err, valid) => {
+      if (err || !valid){
+        return new Error();
+      }
+      this.password = password;
+      return this.save();
+    });
   },
 
   validPassword(password, cb) {
-    bcrypt.compare(password, this.password, cb);
+    return bcrypt.compare(password, this.password, cb);
   }
 });
 

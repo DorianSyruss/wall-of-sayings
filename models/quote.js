@@ -5,14 +5,19 @@ const { Schema } = mongoose;
 const { ObjectId } = Schema;
 
 const quote = new Schema({
-  quote: String,
-  author: String,
-  type: String,
+  quote: { type: String, required: true },
+  author: { type: String, required: true },
+  type: {
+    type: String,
+    required: true,
+    enum: ['private', 'public', 'voting'],
+    default: 'private'
+  },
   owner: ObjectId,
   tags: [String],
   favoritedCount: Number,
   favoritedBy: [ObjectId],
-  publishedOn: Date
+  publishedAt: Date
 }, { timestamps: { createdAt: 'created_at' } });
 
 Object.assign(quote.methods, {
@@ -36,7 +41,7 @@ Object.assign(quote.methods, {
 
   trackPublishing(type) {
     if (type !== 'public') return;
-    this.publishedOn = new Date;
+    this.publishedAt = new Date;
   }
 });
 
