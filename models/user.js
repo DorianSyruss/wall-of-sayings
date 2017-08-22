@@ -2,7 +2,9 @@
 
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
+const validator = require('validator');
 const helpers = require('./helpers');
+const { OperationalError } = require('bluebird');
 const { Schema } = mongoose;
 
 const Role = {
@@ -21,13 +23,25 @@ const Role = {
 
 const User = new Schema({
   facebookId: String,
-  name: { type: String, required: true, minlength: 2 },
-  surname: { type: String, required: true, minlength: 2 },
+  name: { type: String,
+    required: true,
+    minlength: 2,
+    maxlength: 100
+  },
+  surname: { type: String,
+    required: true,
+    minlength: 2,
+    maxlength: 100
+  },
   gender: String,
   email: {
     type: String,
     unique: true,
-    required: true
+    required: true,
+    validate: {
+      message: 'Email validation failed',
+      validator: validator.isEmail
+    }
   },
   password: {
     type: String,
@@ -59,13 +73,14 @@ Object.assign(User.methods, {
   },
 
   updatePassword(oldPassword, password) {
-    return this.validPassword(oldPassword, (err, valid) => {
-      if (err || !valid){
-        return new Error();
-      }
-      this.password = password;
-      return this.save();
-    });
+    return bcrypt.compare(oldPassword, this.password)
+      .then(valid => {
+        if (!valid) {
+          return Promise.reject(new OperationalError('Passwords do not match'));
+        }
+        this.password = password;
+        return this.save();
+      });
   },
 
   validPassword(password, cb) {

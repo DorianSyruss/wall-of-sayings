@@ -5,8 +5,18 @@ const { Schema } = mongoose;
 const { ObjectId } = Schema;
 
 const quote = new Schema({
-  quote: { type: String, required: true },
-  author: { type: String, required: true },
+  quote: {
+    type: String,
+    required: true,
+    minlength: 2,
+    maxlength: 500
+  },
+  author: {
+    type: String,
+    required: true,
+    minlength: 2,
+    maxlength: 100
+  },
   type: {
     type: String,
     required: true,
@@ -41,7 +51,9 @@ Object.assign(quote.methods, {
 
   trackPublishing(type) {
     if (type !== 'public') return;
-    this.publishedAt = new Date;
+    if (delete this.owner) {
+      this.publishedAt = new Date;
+    }
   }
 });
 

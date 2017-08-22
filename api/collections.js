@@ -211,7 +211,7 @@ function removeQuoteFromMyCollection(req, res, next) {
       }
       return quoteCollection.removeQuote(req.body.quoteId, req.user.id)
         .then(status => res.status(HTTPStatus.OK).send(status))
-        .error((e) => res.status(HTTPStatus.BAD_REQUEST).send(e.message));
+        .error(e => res.status(HTTPStatus.BAD_REQUEST).send(e.message));
     })
     .catch(err => next(err));
 }

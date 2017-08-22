@@ -108,6 +108,7 @@ function resetPassword(req, res, next) {
       return user.updatePassword(req.body.oldPassword, req.body.password);
     })
     .then(() => res.status(HTTPStatus.NO_CONTENT).send())
+    .error(e => res.status(HTTPStatus.BAD_REQUEST).send(e.message))
     .catch(err => {
       const message = get(err, 'errors.password.message');
       if (message) {

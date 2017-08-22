@@ -7,10 +7,15 @@ const { ObjectId } = Schema;
 
 const quoteCollection = new Schema({
   owner: ObjectId,
-  title: String,
-  description: String,
+  title: { type: String, required: true, maxlength: 140 },
+  description: { type: String, maxlength: 500 },
   category: String,
-  type: String,
+  type: {
+    type: String,
+    required: true,
+    enum: ['private', 'public'],
+    default: 'private'
+  },
   quotes: [ObjectId],
   collaborators: [ObjectId]
 }, { timestamps: { createdAt: 'created_at' } });
@@ -34,9 +39,6 @@ Object.assign(quoteCollection.methods, {
   removeQuote(quoteId, userId) {
     return mongoose.model('Quote').findById(quoteId)
       .then(quote => {
-        if (!quote) {
-          return Promise.reject(new OperationalError('Quote does not exist'));
-        }
 
         this.quotes.remove(quoteId);
         quote.untrackUser(userId);
@@ -47,7 +49,8 @@ Object.assign(quoteCollection.methods, {
 
   getQuotes() {
     const Quote = mongoose.model('Quote');
-    return Promise.all(this.quotes.map(id => Quote.findById(id)));
+    return Promise.all(this.quotes.map(id => Quote.findById(id)))
+      .then(quotes => quotes.filter((quote) => quote !== null));
   },
 
   addCollaborators(collaborator_ids = []) {
