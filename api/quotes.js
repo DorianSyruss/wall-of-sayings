@@ -4,6 +4,7 @@ const Quote = require('../models/quote');
 const router = require('express').Router();
 const HTTPStatus = require('http-status');
 const dropProperties = require('lodash/omit');
+const Types = require('../models/quote').types;
 const { user } = require('../auth/permissions');
 
 //props to omit for this data model, safety measure
@@ -104,7 +105,7 @@ function getMyQuote(req, res, next) {
 function updateMyQuote(req, res, next) {
   const data = dropProperties(req.body, immutables);
   data.type = 'private';
-  Quote.findByIdAndUpdate(req.params.id, data, { new: true })
+  Quote.findByIdAndUpdate(req.params.id, data, { new: true, runValidators: true })
     .then(quote => {
       if (!quote) {
         return res.status(HTTPStatus.NO_CONTENT).end();
@@ -159,9 +160,11 @@ function getQuote(req, res, next) {
 
 function updateQuote(req, res, next) {
   const data = dropProperties(req.body, immutables);
-  Quote.findOneAndUpdate(req.params.id, data, { new: true })
+  Quote.findOneAndUpdate(req.params.id, data, { new: true, runValidators: true })
     .then(quote => {
-      quote.trackPublishing(quote.type);
+      if (quote.type === Types.Public) {
+        quote.publish(quote.type);
+      }
       res.status(HTTPStatus.OK).send(quote);
     })
     .catch(err => next(err));

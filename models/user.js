@@ -28,7 +28,8 @@ const User = new Schema({
     minlength: 2,
     maxlength: 100
   },
-  surname: { type: String,
+  surname: {
+    type: String,
     required: true,
     minlength: 2,
     maxlength: 100
@@ -53,7 +54,10 @@ const User = new Schema({
       }
     }
   },
-  role: { type: Number, default: Role.User, validate: Role.isValid }
+  role: {
+    type: Number,
+    default: Role.User,
+    validate: Role.isValid }
 }, { timestamps: { createdAt: 'created_at' } });
 
 User.pre('save', function (next) {

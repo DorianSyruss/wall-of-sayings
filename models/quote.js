@@ -3,6 +3,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const { ObjectId } = Schema;
+const { omit } = require('../models/helpers');
 
 const quote = new Schema({
   quote: {
@@ -30,6 +31,12 @@ const quote = new Schema({
   publishedAt: Date
 }, { timestamps: { createdAt: 'created_at' } });
 
+const Type = {
+  Private: 'private',
+  Public: 'public',
+  Voting: 'voting'
+};
+
 Object.assign(quote.methods, {
   getAuthor() {
     return this.author;
@@ -49,11 +56,15 @@ Object.assign(quote.methods, {
     return this.favoritedCount = this.favoritedBy.length;
   },
 
-  trackPublishing(type) {
-    if (type !== 'public') return;
-    if (delete this.owner) {
-      this.publishedAt = new Date;
-    }
+  publish() {
+    if (this.owner) omit([this.owner]);
+    this.publishedAt = new Date;
+  }
+});
+
+Object.assign(quote.statics, {
+  get types() {
+    return Type;
   }
 });
 

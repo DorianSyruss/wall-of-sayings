@@ -4,17 +4,25 @@ const mongoose = require('mongoose');
 const { OperationalError } = require('bluebird');
 const { Schema } = mongoose;
 const { ObjectId } = Schema;
+const Types = require('../models/quote').types;
 
 const quoteCollection = new Schema({
   owner: ObjectId,
-  title: { type: String, required: true, maxlength: 140 },
-  description: { type: String, maxlength: 500 },
+  title: {
+    type: String,
+    required: true,
+    maxlength: 140
+  },
+  description: {
+    type: String,
+    maxlength: 500
+  },
   category: String,
   type: {
     type: String,
     required: true,
-    enum: ['private', 'public'],
-    default: 'private'
+    enum: [Types.Private, Types.Public],
+    default: Types.Private
   },
   quotes: [ObjectId],
   collaborators: [ObjectId]

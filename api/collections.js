@@ -135,7 +135,7 @@ function updateMyQuoteCollection(req, res, next) {
   const immutables = ['owner', 'quotes'];
   const update = dropProperties(req.body, immutables);
   const query = { owner: req.user.id, _id: req.params.id };
-  QuoteCollection.findOneAndUpdate(query, update, { new: true })
+  QuoteCollection.findOneAndUpdate(query, update, { new: true, runValidators: true })
     .then(quote => res.status(HTTPStatus.OK).send(quote))
     .catch(err => next(err));
 }
@@ -211,7 +211,7 @@ function removeQuoteFromMyCollection(req, res, next) {
       }
       return quoteCollection.removeQuote(req.body.quoteId, req.user.id)
         .then(status => res.status(HTTPStatus.OK).send(status))
-        .error(e => res.status(HTTPStatus.BAD_REQUEST).send(e.message));
+        .error(err => res.status(HTTPStatus.BAD_REQUEST).send(err.message));
     })
     .catch(err => next(err));
 }
@@ -254,7 +254,7 @@ function getQuoteCollection(req, res, next) {
 
 function updateQuoteCollection(req, res, next) {
   const data = dropProperties(req.body, immutables);
-  QuoteCollection.findOneAndUpdate(req.params.id, data, { new: true })
+  QuoteCollection.findOneAndUpdate(req.params.id, data, { new: true, runValidators: true })
     .then(quote => res.status(HTTPStatus.OK).send(quote))
     .catch(err => next(err));
 }
