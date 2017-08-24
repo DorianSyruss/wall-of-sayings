@@ -104,8 +104,9 @@ function getMyQuote(req, res, next) {
 
 function updateMyQuote(req, res, next) {
   const data = dropProperties(req.body, immutables);
+  const options = { new: true, runValidators: true };
   data.type = 'private';
-  Quote.findByIdAndUpdate(req.params.id, data, { new: true, runValidators: true })
+  Quote.findByIdAndUpdate(req.params.id, data, options)
     .then(quote => {
       if (!quote) {
         return res.status(HTTPStatus.NO_CONTENT).end();
@@ -160,7 +161,8 @@ function getQuote(req, res, next) {
 
 function updateQuote(req, res, next) {
   const data = dropProperties(req.body, immutables);
-  Quote.findOneAndUpdate(req.params.id, data, { new: true, runValidators: true })
+  const options = { new: true, runValidators: true };
+  Quote.findOneAndUpdate(req.params.id, data, options)
     .then(quote => {
       if (quote.type === Types.Public) {
         quote.publish(quote.type);

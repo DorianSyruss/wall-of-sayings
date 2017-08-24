@@ -91,7 +91,8 @@ function getMyProfile(req, res, next) {
 
 function updateMyProfile(req, res, next) {
   const update = dropProperties(req.body, [ ...immutables, 'password']);
-  User.findByIdAndUpdate(req.user.id, update, { new: true, runValidators: true })
+  const options = { new: true, runValidators: true };
+  User.findByIdAndUpdate(req.user.id, update, options)
     .then(user => res.status(HTTPStatus.OK).send(user))
     .catch(err => next(err));
 }
@@ -152,7 +153,8 @@ function getUser(req, res, next) {
 function updateUser(req, res, next) {
   const privateData = ['password'];
   const update = dropProperties(req.body, privateData);
-  User.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true }).omit(privateData)
+  const options = { new: true, runValidators: true };
+  User.findByIdAndUpdate(req.params.id, update, options).omit(privateData)
     .then(user => {
       if (!user) {
         return res.status(HTTPStatus.NO_CONTENT).end();
