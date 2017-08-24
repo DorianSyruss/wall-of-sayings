@@ -4,7 +4,7 @@ const Quote = require('../models/quote');
 const router = require('express').Router();
 const HTTPStatus = require('http-status');
 const dropProperties = require('lodash/omit');
-const Types = require('../models/quote').types;
+const { Types } = require('../models/quote');
 const { user } = require('../auth/permissions');
 
 //props to omit for this data model, safety measure

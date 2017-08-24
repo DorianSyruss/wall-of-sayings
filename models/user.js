@@ -2,7 +2,7 @@
 
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
-const validator = require('validator');
+const emailValidator = require('email-validator');
 const helpers = require('./helpers');
 const { OperationalError } = require('bluebird');
 const { Schema } = mongoose;
@@ -41,7 +41,7 @@ const User = new Schema({
     required: true,
     validate: {
       message: 'Email validation failed',
-      validator: validator.isEmail
+      validator: emailValidator.validate
     }
   },
   password: {

@@ -31,7 +31,7 @@ const quote = new Schema({
   publishedAt: Date
 }, { timestamps: { createdAt: 'created_at' } });
 
-const Type = {
+const Types = {
   Private: 'private',
   Public: 'public',
   Voting: 'voting'
@@ -62,10 +62,6 @@ Object.assign(quote.methods, {
   }
 });
 
-Object.assign(quote.statics, {
-  get types() {
-    return Type;
-  }
-});
+Object.assign(quote.statics, { Types });
 
 module.exports = mongoose.model('Quote', quote);

@@ -25,6 +25,7 @@
     "body-parser": "^1.17.2",
     "connect-roles": "^3.1.2",
     "dotenv": "^4.0.0",
+    "email-validator": "^1.1.1",
     "express": "^4.15.2",
     "express-session": "^1.15.2",
     "http-status": "^1.0.1",
@@ -34,7 +35,6 @@
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.1",
     "passport-local": "^1.0.0",
-    "password-validator": "^4.0.0",
-    "validator": "^8.1.0"
+    "password-validator": "^4.0.0"
   }
 }

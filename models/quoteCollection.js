@@ -4,7 +4,8 @@ const mongoose = require('mongoose');
 const { OperationalError } = require('bluebird');
 const { Schema } = mongoose;
 const { ObjectId } = Schema;
-const Types = require('../models/quote').types;
+const { Types } = require('../models/quote');
+const toArray = require('lodash/toArray');
 
 const quoteCollection = new Schema({
   owner: ObjectId,
@@ -21,7 +22,7 @@ const quoteCollection = new Schema({
   type: {
     type: String,
     required: true,
-    enum: [Types.Private, Types.Public],
+    enum: toArray(Types),
     default: Types.Private
   },
   quotes: [ObjectId],
