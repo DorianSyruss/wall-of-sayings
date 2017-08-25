@@ -198,7 +198,7 @@ function addQuoteToMyCollection(req, res, next) {
       }
       return quoteCollection.addQuote(req.body.quoteId, req.user.id)
         .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
-        .error(e => res.status(HTTPStatus.BAD_REQUEST).send(e.message));
+        .error(err => res.status(HTTPStatus.BAD_REQUEST).send(err.message));
       })
     .catch(err => next(err));
 }
@@ -275,7 +275,7 @@ function addQuoteToCollection(req, res, next) {
       }
       return quoteCollection.addQuote(req.body.quoteId, req.user.id)
         .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
-        .error(e => res.status(HTTPStatus.BAD_REQUEST).send(e.message));
+        .error(err => res.status(HTTPStatus.BAD_REQUEST).send(err.message));
     })
     .catch(err => next(err));
 }
@@ -288,7 +288,7 @@ function removeQuoteFromCollection(req, res, next) {
       }
       return quoteCollection.removeQuote(req.body.quoteId, req.user.id)
         .then(status => res.status(HTTPStatus.OK).send(status))
-        .error(e => res.status(HTTPStatus.BAD_REQUEST).send(e.message));
+        .error(err => res.status(HTTPStatus.BAD_REQUEST).send(err.message));
     })
     .catch(err => next(err));
 }
