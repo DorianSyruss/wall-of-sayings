@@ -38,7 +38,7 @@ module.exports = router;
 function listPublicQuotes(req, res, next) {
   const offset = parseInt(req.query.offset, 10) || 0;
   const limit = parseInt(req.query.limit, 10) || defaultLimit;
-  Quote.find({ type: 'public' })
+  Quote.find({ type: Types.Public })
     .skip(offset)
     .limit(limit)
     .then(quotes => {
@@ -51,7 +51,7 @@ function listPublicQuotes(req, res, next) {
 }
 
 function getPublicQuote(req, res, next) {
-  const query = { _id: req.params.id, type: 'public' };
+  const query = { _id: req.params.id, type: Types.Public };
   Quote.findOne(query)
     .then(quote => {
       if (!quote) {
@@ -68,7 +68,7 @@ function createMyQuote(req, res, next) {
   let data = req.body;
   data = dropProperties(data, immutables);
   data.owner = req.user.id;
-  data.type = 'private';
+  data.type = Types.Private;
 
   Quote.create(data)
     .then(quote => res.status(HTTPStatus.OK).send(quote))
@@ -105,7 +105,7 @@ function getMyQuote(req, res, next) {
 function updateMyQuote(req, res, next) {
   const data = dropProperties(req.body, immutables);
   const options = { new: true, runValidators: true };
-  data.type = 'private';
+  data.type = Types.Private;
   Quote.findByIdAndUpdate(req.params.id, data, options)
     .then(quote => {
       if (!quote) {
@@ -127,7 +127,7 @@ function deleteMyQuote(req, res, next) {
 
 function createQuote(req, res, next) {
   const data = dropProperties(req.body, immutables);
-  data.type = 'public';
+  data.type = Types.Public;
   Quote.create(data)
     .then(quote => res.status(HTTPStatus.OK).send(quote))
     .catch(err => next(err));

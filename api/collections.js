@@ -5,6 +5,7 @@ const router = require('express').Router();
 const QuoteCollection = require('../models/quoteCollection');
 const dropProperties = require('lodash/omit');
 const { user } = require('../auth/permissions');
+const { Types } = require('../models/quote');
 
 //props to omit for this data model, safety measure
 const immutables = ['owner'];
@@ -46,7 +47,7 @@ module.exports = router;
 // -----> Public routes, accessible with any role <------
 
 function listPublicCollections(req, res, next) {
-  const query = { type: 'public' };
+  const query = { type: Types.Public };
   const offset = parseInt(req.query.offset, 10) || 0;
   const limit = parseInt(req.query.limit, 10) || defaultLimit;
   QuoteCollection.find(query)
@@ -62,7 +63,7 @@ function listPublicCollections(req, res, next) {
 }
 
 function getPublicCollection(req, res, next) {
-  const query = { type: 'public', _id: req.params.id };
+  const query = { type: Types.Public, _id: req.params.id };
   QuoteCollection.findOne(query)
     .then(quoteCollection => {
       if (!quoteCollection) {
@@ -74,20 +75,26 @@ function getPublicCollection(req, res, next) {
 }
 
 function listPublicCollectionQuotes(req, res, next) {
-  const query = { type: 'public', _id: req.params.id };
+  const query = { type: Types.Public, _id: req.params.id };
   QuoteCollection.findOne(query)
     .then(quoteCollection => {
       if (!quoteCollection) {
         return res.status(HTTPStatus.NO_CONTENT).end();
       }
       return quoteCollection.getQuotes()
-        .then(quotes => res.status(HTTPStatus.OK).send(quotes));
+        .then(quotes => {
+         Promise.all(quotes.map((quote) => {
+           if (quote.type === Types.Public) return quote;
+           else return quote.type;
+         }))
+          .then(publicQuotes => res.status(HTTPStatus.OK).send(publicQuotes));
+        });
     })
     .catch(err => next(err));
 }
 
 function listPublicCollectionCollaborators(req, res, next) {
-  const query = { type: 'public', _id: req.params.id };
+  const query = { type: Types.Public, _id: req.params.id };
   QuoteCollection.findById(query)
     .then(quoteCollection => {
       if (!quoteCollection) {
@@ -132,7 +139,7 @@ function getMyQuoteCollection(req, res, next) {
 }
 
 function updateMyQuoteCollection(req, res, next) {
-  const immutables = ['owner', 'quotes'];
+  const immutables = ['quotes', ...immutables];
   const update = dropProperties(req.body, immutables);
   const query = { owner: req.user.id, _id: req.params.id };
   const options = { new: true, runValidators: true };

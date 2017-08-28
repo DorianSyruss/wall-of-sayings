@@ -58,7 +58,7 @@ Object.assign(quoteCollection.methods, {
 
   getQuotes() {
     const Quote = mongoose.model('Quote');
-    return Quote.find({ _id: { $in: this.quotes } });
+    return Quote.findManyById(this.quotes);
   },
 
   addCollaborators(collaborator_ids = []) {
@@ -74,7 +74,7 @@ Object.assign(quoteCollection.methods, {
   getCollaborators() {
     const privateData = ['password'];
     const User = mongoose.model('User');
-    return User.find({ _id: { $in: this.collaborators } }).omit(privateData);
+    return User.findManyById(this.collaborators).omit(privateData);
   }
 });
 
