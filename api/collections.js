@@ -4,6 +4,7 @@ const HTTPStatus = require('http-status');
 const router = require('express').Router();
 const QuoteCollection = require('../models/quoteCollection');
 const dropProperties = require('lodash/omit');
+const pickProperties = require('lodash/pick');
 const { user } = require('../auth/permissions');
 const { Types } = require('../models/quote');
 
@@ -47,9 +48,11 @@ module.exports = router;
 // -----> Public routes, accessible with any role <------
 
 function listPublicCollections(req, res, next) {
-  const query = { type: Types.Public };
+  const properties = ['owner', 'category'];
+  const query = pickProperties(req.query, properties);
   const offset = parseInt(req.query.offset, 10) || 0;
   const limit = parseInt(req.query.limit, 10) || defaultLimit;
+  query.type = Types.Public;
   QuoteCollection.find(query)
     .skip(offset)
     .limit(limit)
@@ -81,14 +84,8 @@ function listPublicCollectionQuotes(req, res, next) {
       if (!quoteCollection) {
         return res.status(HTTPStatus.NO_CONTENT).end();
       }
-      return quoteCollection.getQuotes()
-        .then(quotes => {
-         Promise.all(quotes.map((quote) => {
-           if (quote.type === Types.Public) return quote;
-           else return quote.type;
-         }))
-          .then(publicQuotes => res.status(HTTPStatus.OK).send(publicQuotes));
-        });
+      return quoteCollection.getQuotes(Types.Public)
+        .then(quotes => res.status(HTTPStatus.OK).send(quotes));
     })
     .catch(err => next(err));
 }
@@ -117,9 +114,12 @@ function createQuoteCollection(req, res, next) {
 }
 
 function listMyCollections(req, res, next) {
+  const properties = ['category', 'type'];
+  const query = pickProperties(req.query, properties);
   const offset = parseInt(req.query.offset, 10) || 0;
   const limit = parseInt(req.query.limit, 10) || defaultLimit;
-  QuoteCollection.find({ owner: req.user.id })
+  query.owner = req.user.id;
+  QuoteCollection.find(query)
     .skip(offset)
     .limit(limit)
     .then(quoteCollections => res.status(HTTPStatus.OK).send(quoteCollections))
@@ -139,8 +139,8 @@ function getMyQuoteCollection(req, res, next) {
 }
 
 function updateMyQuoteCollection(req, res, next) {
-  const immutables = ['quotes', ...immutables];
-  const update = dropProperties(req.body, immutables);
+  const privateData = ['quotes', ...immutables];
+  const update = dropProperties(req.body, privateData);
   const query = { owner: req.user.id, _id: req.params.id };
   const options = { new: true, runValidators: true };
   QuoteCollection.findOneAndUpdate(query, update, options)
@@ -240,9 +240,11 @@ function listMyCollectionQuotes(req, res, next) {
 // -----> Role based routes, admin <------
 
 function listQuoteCollections(req, res, next) {
+  const properties = ['owner', 'category', 'type'];
+  const query = pickProperties(req.query, properties);
   const offset = parseInt(req.query.offset, 10) || 0;
   const limit = parseInt(req.query.limit, 10) || defaultLimit;
-  QuoteCollection.find()
+  QuoteCollection.find(query)
     .skip(offset)
     .limit(limit)
     .then(quoteCollections => res.status(HTTPStatus.OK).send(quoteCollections))

@@ -56,9 +56,12 @@ Object.assign(quoteCollection.methods, {
       .then(() => this.save());
   },
 
-  getQuotes() {
+  getQuotes(type) {
     const Quote = mongoose.model('Quote');
-    return Quote.findManyById(this.quotes);
+    if (type === Types.Public) {
+      return Quote.getPublicById(this.quotes);
+    }
+    return Quote.getAllById(this.quotes);
   },
 
   addCollaborators(collaborator_ids = []) {
@@ -76,6 +79,7 @@ Object.assign(quoteCollection.methods, {
     const User = mongoose.model('User');
     return User.findManyById(this.collaborators).omit(privateData);
   }
+
 });
 
 module.exports = mongoose.model('QuoteCollection', quoteCollection);

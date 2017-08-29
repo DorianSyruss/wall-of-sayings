@@ -4,6 +4,7 @@ const Quote = require('../models/quote');
 const router = require('express').Router();
 const HTTPStatus = require('http-status');
 const dropProperties = require('lodash/omit');
+const pickProperties = require('lodash/pick');
 const { Types } = require('../models/quote');
 const { user } = require('../auth/permissions');
 
@@ -36,9 +37,12 @@ module.exports = router;
 // -----> Guest routes, no login needed <------
 
 function listPublicQuotes(req, res, next) {
+  const properties = ['author', 'tags', 'publishedAt'];
+  const query = pickProperties(req.query, properties);
   const offset = parseInt(req.query.offset, 10) || 0;
   const limit = parseInt(req.query.limit, 10) || defaultLimit;
-  Quote.find({ type: Types.Public })
+  query.type = Types.Public;
+  Quote.find(query)
     .skip(offset)
     .limit(limit)
     .then(quotes => {
@@ -76,9 +80,12 @@ function createMyQuote(req, res, next) {
 }
 
 function listMyQuotes(req, res, next) {
+  const properties = ['author', 'tags', 'publishedAt', 'type'];
+  const query = pickProperties(req.query, properties);
   const offset = parseInt(req.query.offset, 10) || 0;
   const limit = parseInt(req.query.limit, 10) || defaultLimit;
-  Quote.find({ owner: req.user.id })
+  query.owner = req.user.id;
+  Quote.find(query)
     .skip(offset)
     .limit(limit)
     .then(quotes => {
@@ -134,9 +141,11 @@ function createQuote(req, res, next) {
 }
 
 function listQuotes(req, res, next) {
+  const properties = ['author', 'tags', 'publishedAt', 'type'];
+  const query = pickProperties(req.query, properties);
   const offset = parseInt(req.query.offset, 10) || 0;
   const limit = parseInt(req.query.limit, 10) || defaultLimit;
-  Quote.find()
+  Quote.find(query)
     .skip(offset)
     .limit(limit)
     .then(quotes => {
