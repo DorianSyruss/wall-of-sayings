@@ -58,10 +58,7 @@ Object.assign(quoteCollection.methods, {
 
   getQuotes(type) {
     const Quote = mongoose.model('Quote');
-    if (type === Types.Public) {
-      return Quote.getPublicById(this.quotes);
-    }
-    return Quote.getAllById(this.quotes);
+    return Quote.getById(this.quotes, type);
   },
 
   addCollaborators(collaborator_ids = []) {

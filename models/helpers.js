@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const SALT_WORK_FACTOR = 8;
 const passwordValidator = require('password-validator');
 const mongoose = require('mongoose');
-const { Types } = require('./quote');
+const omitBy = require('lodash/omitBy');
 
 function pick(props = []) {
   const include = props.map(prop => `${prop}`).join(' ');
@@ -33,13 +33,9 @@ passwordSchema
 
 module.exports = { omit, pick, hash, passwordSchema };
 
-
 Object.assign(mongoose.Model, {
-  getAllById(arrayOfIds) {
-    return this.find({ _id: { $in: arrayOfIds } });
-  },
-
-  getPublicById(arrayOfIds) {
-    return this.find({ _id: { $in: arrayOfIds }, type: Types.Public });
+  getById(arrayOfIds, type) {
+    const conditions = { _id: { $in: arrayOfIds }, type };
+    return this.find(omitBy(conditions, prop => !prop));
   }
 });
