@@ -5,6 +5,7 @@ const SALT_WORK_FACTOR = 8;
 const passwordValidator = require('password-validator');
 const mongoose = require('mongoose');
 const omitBy = require('lodash/omitBy');
+const mapValues = require('lodash/mapValues');
 
 function pick(props = []) {
   const include = props.map(prop => `${prop}`).join(' ');
@@ -34,8 +35,10 @@ passwordSchema
 module.exports = { omit, pick, hash, passwordSchema };
 
 Object.assign(mongoose.Model, {
-  getById(arrayOfIds, type) {
-    const conditions = { _id: { $in: arrayOfIds }, type };
-    return this.find(omitBy(conditions, prop => !prop));
+  findMany(query = {}) {
+    let filter = mapValues(query, val => Array.isArray(val) ? { $in: val } : val);
+    filter = omitBy(filter, val => val === '*');
+
+    return this.find(filter);
   }
 });

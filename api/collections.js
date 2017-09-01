@@ -84,7 +84,7 @@ function listPublicCollectionQuotes(req, res, next) {
       if (!quoteCollection) {
         return res.status(HTTPStatus.NO_CONTENT).end();
       }
-      return quoteCollection.getQuotes(Types.Public)
+      return quoteCollection.getQuotes({ type: '*' })
         .then(quotes => res.status(HTTPStatus.OK).send(quotes));
     })
     .catch(err => next(err));
