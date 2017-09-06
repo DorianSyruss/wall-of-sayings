@@ -23,7 +23,8 @@ const Role = {
 
 const User = new Schema({
   facebookId: String,
-  name: { type: String,
+  name: {
+    type: String,
     required: true,
     minlength: 2,
     maxlength: 100

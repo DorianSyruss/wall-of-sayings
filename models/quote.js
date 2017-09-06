@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const { ObjectId } = Schema;
 const { omit } = require('../models/helpers');
+const { Types } = require('../models/helpers');
 
 const quote = new Schema({
   quote: {
@@ -30,12 +31,6 @@ const quote = new Schema({
   favoritedBy: [ObjectId],
   publishedAt: Date
 }, { timestamps: { createdAt: 'created_at' } });
-
-const Types = {
-  Private: 'private',
-  Public: 'public',
-  Voting: 'voting'
-};
 
 Object.assign(quote.methods, {
   getAuthor() {

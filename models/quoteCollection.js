@@ -69,7 +69,7 @@ Object.assign(quoteCollection.methods, {
     return this.save();
   },
 
-  removeCollaborators(collaborators_ids) {
+  removeCollaborators(collaborators_ids = []) {
     this.collaborators.remove(...collaborators_ids);
     return this.save();
   },
@@ -78,6 +78,10 @@ Object.assign(quoteCollection.methods, {
     const privateData = ['password'];
     const User = mongoose.model('User');
     return User.findMany({ _id: this.collaborators }).omit(privateData);
+  },
+
+  isCollaboratedBy(userId) {
+    return this.find({ collaborators: { $in: userId } });
   }
 
 });

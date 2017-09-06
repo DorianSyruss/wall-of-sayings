@@ -21,6 +21,17 @@ function hash(password) {
   return bcrypt.hash(password, SALT_WORK_FACTOR);
 }
 
+const Types = {
+  Private: 'private',
+  Public: 'public',
+  Voting: 'voting'
+};
+
+const filter = {
+  true: 'true',
+  false: 'false'
+};
+
 //password validation
 const passwordSchema = new passwordValidator();
 passwordSchema
@@ -32,7 +43,7 @@ passwordSchema
   .has().not().spaces() // Should not have spaces
   .is().not().oneOf(['Password', 'password', 'password123']); // Blacklist these values
 
-module.exports = { omit, pick, hash, passwordSchema };
+module.exports = { omit, pick, hash, passwordSchema, Types, filter };
 
 Object.assign(mongoose.Model, {
   findMany(query = {}) {

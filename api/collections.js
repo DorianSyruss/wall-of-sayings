@@ -7,7 +7,7 @@ const dropProperties = require('lodash/omit');
 const pickProperties = require('lodash/pick');
 const { user } = require('../auth/permissions');
 const { Types } = require('../models/quote');
-
+const { filter } = require('../models/helpers');
 //props to omit for this data model, safety measure
 const immutables = ['owner'];
 const defaultLimit = 50;
@@ -84,7 +84,7 @@ function listPublicCollectionQuotes(req, res, next) {
       if (!quoteCollection) {
         return res.status(HTTPStatus.NO_CONTENT).end();
       }
-      return quoteCollection.getQuotes({ type: '*' })
+      return quoteCollection.getQuotes({ type: Types.Public })
         .then(quotes => res.status(HTTPStatus.OK).send(quotes));
     })
     .catch(err => next(err));
@@ -119,7 +119,15 @@ function listMyCollections(req, res, next) {
   const offset = parseInt(req.query.offset, 10) || 0;
   const limit = parseInt(req.query.limit, 10) || defaultLimit;
   query.owner = req.user.id;
-  QuoteCollection.find(query)
+  let quoteCollection;
+
+  if (req.query.collaborations === filter.true) {
+    quoteCollection = QuoteCollection.findMany({ collaborators: req.user.id });
+  } else {
+    quoteCollection = QuoteCollection.find(query);
+  }
+
+  quoteCollection
     .skip(offset)
     .limit(limit)
     .then(quoteCollections => res.status(HTTPStatus.OK).send(quoteCollections))
@@ -143,6 +151,7 @@ function updateMyQuoteCollection(req, res, next) {
   const update = dropProperties(req.body, privateData);
   const query = { owner: req.user.id, _id: req.params.id };
   const options = { new: true, runValidators: true };
+
   QuoteCollection.findOneAndUpdate(query, update, options)
     .then(quote => res.status(HTTPStatus.OK).send(quote))
     .catch(err => next(err));
@@ -156,28 +165,28 @@ function deleteMyQuoteCollection(req, res, next) {
 }
 
 function addMyCollaborators(req, res, next) {
-  const collaborator_ids = req.body.collaborator_ids;
+  const collaboratorIds = req.body.collaboratorIds;
   const query = { owner: req.user.id, _id: req.params.id };
   QuoteCollection.findOne(query)
     .then(quoteCollection => {
       if (!quoteCollection) {
         return res.status(HTTPStatus.NO_CONTENT).end();
       }
-      return quoteCollection.addCollaborators(collaborator_ids)
+      return quoteCollection.addCollaborators(collaboratorIds)
         .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection));
     })
     .catch(err => next(err));
 }
 
 function removeMyCollaborators(req, res, next) {
-  const collaborator_ids = req.body.collaborator_ids || [];
+  const collaboratorIds = req.body.collaboratorIds || [];
   const query = { owner: req.user.id, _id: req.params.id };
   QuoteCollection.findOne(query)
     .then(quoteCollection => {
       if (!quoteCollection) {
         return res.status(HTTPStatus.NO_CONTENT).end();
       }
-      return quoteCollection.removeCollaborators(collaborator_ids)
+      return quoteCollection.removeCollaborators(collaboratorIds)
         .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection));
     })
     .catch(err => next(err));
@@ -315,26 +324,26 @@ function listCollectionQuotes(req, res, next) {
 }
 
 function addCollaborators(req, res, next) {
-  const collaborator_ids = req.body.collaborator_ids;
+  const collaboratorIds = req.body.collaboratorIds;
   QuoteCollection.findOne(req.params.id)
     .then(quoteCollection => {
       if (!quoteCollection) {
         return res.status(HTTPStatus.NO_CONTENT).end();
       }
-      return quoteCollection.addCollaborators(collaborator_ids)
+      return quoteCollection.addCollaborators(collaboratorIds)
         .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection));
     })
     .catch(err => next(err));
 }
 
 function removeCollaborators(req, res, next) {
-  const collaborator_ids = req.body.collaborator_ids || [];
+  const collaboratorIds = req.body.collaboratorIds || [];
   QuoteCollection.findById(req.params.id)
     .then(quoteCollection => {
       if (!quoteCollection) {
         return res.status(HTTPStatus.NO_CONTENT).end();
       }
-      return quoteCollection.removeCollaborators(collaborator_ids)
+      return quoteCollection.removeCollaborators(collaboratorIds)
         .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection));
     })
     .catch(err => next(err));
