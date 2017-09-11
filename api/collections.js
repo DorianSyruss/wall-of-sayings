@@ -5,45 +5,214 @@ const router = require('express').Router();
 const QuoteCollection = require('../models/quoteCollection');
 const dropProperties = require('lodash/omit');
 const pickProperties = require('lodash/pick');
+const get = require('lodash/get');
 const { user } = require('../auth/permissions');
 const { Types } = require('../models/quote');
 const { filter } = require('../models/helpers');
+const Roles = require('../models/user').roles();
 //props to omit for this data model, safety measure
 const immutables = ['owner'];
 const defaultLimit = 50;
 
 //accessible with any role
 router.get('/public/collections', user.is('auth'), listPublicCollections);
-router.get('/public/collections/:id', user.is('auth'), getPublicCollection);
-router.get('/public/collections/:id/quotes', user.is('auth'), listPublicCollectionQuotes);
-router.get('/public/collections/:id/collaborators', user.is('auth'), listPublicCollectionCollaborators);
-
-//logged user specific routes
-router.post('/collections', user.is('auth'),  createQuoteCollection);
+// router.get('/public/collections/:id', user.is('auth'), getPublicCollection);
+// router.get('/public/collections/:id/quotes', user.is('auth'), listPublicCollectionQuotes);
+// router.get('/public/collections/:id/collaborators', user.is('auth'), listPublicCollectionCollaborators);
+//
+// //logged user specific routes
+// router.post('/collections', user.is('auth'),  createQuoteCollection);
 router.get('/me/collections', user.is('auth'), listMyCollections);
-router.get('/me/collections/:id', user.is('auth'), getMyQuoteCollection);
-router.put('/me/collections/:id', user.is('auth'), updateMyQuoteCollection);
-router.delete('/me/collections/:id', user.is('auth'), deleteMyQuoteCollection);
-router.post('/me/collections/:id/collaborators', user.is('auth'), addMyCollaborators);
-router.delete('/me/collections/:id/collaborators', user.is('auth'), removeMyCollaborators);
-router.get('/me/collections/:id/collaborators', user.is('auth'), listMyCollaborators);
-router.post('/me/collections/:id/quotes', user.is('auth'), addQuoteToMyCollection);
-router.delete('/me/collections/:id/quotes', user.is('auth'), removeQuoteFromMyCollection);
-router.get('/me/collections/:id/quotes', user.is('auth'), listMyCollectionQuotes);
+// router.get('/me/collections/:id', user.is('auth'), getMyQuoteCollection);
+// router.put('/me/collections/:id', setCollectionToContext, user.can('edit'), user.is('auth'), updateMyQuoteCollection);
+// router.delete('/me/collections/:id', user.is('auth'), deleteMyQuoteCollection);
+// router.post('/me/collections/:id/collaborators', user.is('auth'), addMyCollaborators);
+// router.delete('/me/collections/:id/collaborators', user.is('auth'), removeMyCollaborators);
+// router.get('/me/collections/:id/collaborators', user.is('auth'), listMyCollaborators);
+// router.post('/me/collections/:id/quotes', user.is('auth'), addQuoteToMyCollection);
+// router.delete('/me/collections/:id/quotes', user.is('auth'), removeQuoteFromMyCollection);
+// router.get('/me/collections/:id/quotes', user.is('auth'), listMyCollectionQuotes);
 
 //role based authorization
-router.get('/collections', user.is('auth'), user.is('admin'), listQuoteCollections);
-router.get('/collections/:id', user.is('auth'), user.is('admin'), getQuoteCollection);
-router.put('/collections/:id', user.is('auth'), user.is('admin'), updateQuoteCollection);
-router.delete('/collections/:id', user.is('auth'), user.is('admin'), deleteQuoteCollection);
-router.post('/collections/:id/collaborators', user.is('auth'), user.is('admin'), addCollaborators);
-router.delete('/collections/:id/collaborators', user.is('auth'), user.is('admin'), removeCollaborators);
-router.get('/collections/:id/collaborators', user.is('auth'), user.is('admin'), listCollaborators);
-router.post('/collections/:id/quotes', user.is('auth'), user.is('admin'), addQuoteToCollection);
-router.delete('/collections/:id/quotes', user.is('auth'), user.is('admin'), removeQuoteFromCollection);
-router.get('/collections/:id/quotes', user.is('auth'), user.is('admin'), listCollectionQuotes);
+router.get('/collections', user.is('auth'), listQuoteCollections);
+
+router.get('/collections/:id',
+  user.is('auth'),
+  setContext(QuoteCollection, 'getCollection'),
+  user.can('view'),
+  getQuoteCollection);
+router.put('/collections/:id', user.is('auth'), updateQuoteCollection);
+router.delete('/collections/:id', user.is('auth'), deleteQuoteCollection);
+router.post('/collections/:id/collaborators', user.is('auth'), addCollaborators);
+router.delete('/collections/:id/collaborators', user.is('auth'), removeCollaborators);
+router.get('/collections/:id/collaborators', user.is('auth'), listCollaborators);
+router.post('/collections/:id/quotes', user.is('auth'), addQuoteToCollection);
+router.delete('/collections/:id/quotes', user.is('auth'), removeQuoteFromCollection);
+router.get('/collections/:id/quotes', user.is('auth'), listCollectionQuotes);
 
 module.exports = router;
+
+function setContext(model, name, path = 'params.id') {
+  return function(req, res, next) {
+    const id = get(req, path);
+    req.ctx = {
+      [name](options = {}) {
+        const query = Object.assign({ _id: id }, options);
+        return model.findOne(query);
+      }
+    };
+    next();
+  };
+}
+
+user.use('view', (req, res) => {
+  let query = { $or: [{
+    collaborators: { $in: [req.user.id] }
+  }, {
+    owner: req.user.id
+  }, {
+    type: Types.Public
+  }] };
+
+  if (req.user.role === Roles.Admin) query = {};
+  return req.ctx.getCollection(query)
+    .then(coll => {
+      if (!coll) return false;
+      req.ctx.collection = coll;
+      return true;
+    });
+});
+
+user.use('edit', (req, res) => {
+  req.ctx.getCollection({ collaborators: req.user.id })
+    .then(coll => {
+      if (!coll) return false;
+      req.ctx.collection = coll;
+      return true;
+    });
+});
+
+user.use('owner', req => {
+  const { collection } = req.ctx;
+  const { user } = req.user;
+  return collection.owner.id === user.id;
+});
+
+user.use('collaborator', req => {
+  const { collection } = req.ctx;
+  const { user } = req.user;
+  return collection.isCollaboratedBy(user.id);
+});
+
+// -----> Role based routes, admin <------
+
+function listQuoteCollections(req, res, next) {
+  const properties = ['owner', 'category', 'type'];
+  const query = pickProperties(req.query, properties);
+  const offset = parseInt(req.query.offset, 10) || 0;
+  const limit = parseInt(req.query.limit, 10) || defaultLimit;
+  const collection = req.ctx.collection;
+  collection
+    .skip(offset)
+    .limit(limit)
+    .then(collection => res.status(HTTPStatus.OK).send(collection))
+    .catch(err => next(err));
+}
+
+function getQuoteCollection(req, res, next) {
+  const quoteCollection = req.ctx.collection;
+  res.status(HTTPStatus.OK).send(quoteCollection);
+}
+
+function updateQuoteCollection(req, res, next) {
+  const data = dropProperties(req.body, immutables);
+  const options = { new: true, runValidators: true };
+  QuoteCollection.findOneAndUpdate(req.params.id, data, options)
+    .then(quote => res.status(HTTPStatus.OK).send(quote))
+    .catch(err => next(err));
+}
+
+function deleteQuoteCollection(req, res, next) {
+  QuoteCollection.findByIdAndRemove(req.params.id)
+    .then(() => res.status(HTTPStatus.NO_CONTENT).end())
+    .catch(err => next(err));
+}
+
+function addQuoteToCollection(req, res, next) {
+  QuoteCollection.findById(req.params.id)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.addQuote(req.body.quoteId, req.user.id)
+        .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
+        .error(err => res.status(HTTPStatus.BAD_REQUEST).send(err.message));
+    })
+    .catch(err => next(err));
+}
+
+function removeQuoteFromCollection(req, res, next) {
+  QuoteCollection.findById(req.params.id)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.removeQuote(req.body.quoteId, req.user.id)
+        .then(status => res.status(HTTPStatus.OK).send(status))
+        .error(err => res.status(HTTPStatus.BAD_REQUEST).send(err.message));
+    })
+    .catch(err => next(err));
+}
+
+function listCollectionQuotes(req, res, next) {
+  QuoteCollection.findById(req.params.id)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.getQuotes()
+        .then(quotes => res.status(HTTPStatus.OK).send(quotes));
+    })
+    .catch(err => next(err));
+}
+
+function addCollaborators(req, res, next) {
+  const collaboratorIds = req.body.collaboratorIds;
+  QuoteCollection.findOne(req.params.id)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.addCollaborators(collaboratorIds)
+        .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection));
+    })
+    .catch(err => next(err));
+}
+
+function removeCollaborators(req, res, next) {
+  const collaboratorIds = req.body.collaboratorIds || [];
+  QuoteCollection.findById(req.params.id)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.removeCollaborators(collaboratorIds)
+        .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection));
+    })
+    .catch(err => next(err));
+}
+
+function listCollaborators(req, res, next) {
+  QuoteCollection.findById(req.params.id)
+    .then(quoteCollection => {
+      if (!quoteCollection) {
+        return res.status(HTTPStatus.NO_CONTENT).end();
+      }
+      return quoteCollection.getCollaborators()
+        .then(collaborators => res.status(HTTPStatus.OK).send(collaborators));
+    })
+    .catch(err => next(err));
+}
 
 // -----> Public routes, accessible with any role <------
 
@@ -246,118 +415,5 @@ function listMyCollectionQuotes(req, res, next) {
     .catch(err => next(err));
 }
 
-// -----> Role based routes, admin <------
 
-function listQuoteCollections(req, res, next) {
-  const properties = ['owner', 'category', 'type'];
-  const query = pickProperties(req.query, properties);
-  const offset = parseInt(req.query.offset, 10) || 0;
-  const limit = parseInt(req.query.limit, 10) || defaultLimit;
-  QuoteCollection.find(query)
-    .skip(offset)
-    .limit(limit)
-    .then(quoteCollections => res.status(HTTPStatus.OK).send(quoteCollections))
-    .catch(err => next(err));
-}
-
-function getQuoteCollection(req, res, next) {
-  QuoteCollection.findById(req.params.id)
-    .then(quoteCollection => {
-      if (!quoteCollection) {
-        return res.status(HTTPStatus.NO_CONTENT).send();
-      }
-      return res.status(HTTPStatus.OK).send(quoteCollection);
-    })
-    .catch(err => next(err));
-}
-
-function updateQuoteCollection(req, res, next) {
-  const data = dropProperties(req.body, immutables);
-  const options = { new: true, runValidators: true };
-  QuoteCollection.findOneAndUpdate(req.params.id, data, options)
-    .then(quote => res.status(HTTPStatus.OK).send(quote))
-    .catch(err => next(err));
-}
-
-function deleteQuoteCollection(req, res, next) {
-  QuoteCollection.findByIdAndRemove(req.params.id)
-    .then(() => res.status(HTTPStatus.NO_CONTENT).end())
-    .catch(err => next(err));
-}
-
-function addQuoteToCollection(req, res, next) {
-  QuoteCollection.findById(req.params.id)
-    .then(quoteCollection => {
-      if (!quoteCollection) {
-        return res.status(HTTPStatus.NO_CONTENT).end();
-      }
-      return quoteCollection.addQuote(req.body.quoteId, req.user.id)
-        .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
-        .error(err => res.status(HTTPStatus.BAD_REQUEST).send(err.message));
-    })
-    .catch(err => next(err));
-}
-
-function removeQuoteFromCollection(req, res, next) {
-  QuoteCollection.findById(req.params.id)
-    .then(quoteCollection => {
-      if (!quoteCollection) {
-        return res.status(HTTPStatus.NO_CONTENT).end();
-      }
-      return quoteCollection.removeQuote(req.body.quoteId, req.user.id)
-        .then(status => res.status(HTTPStatus.OK).send(status))
-        .error(err => res.status(HTTPStatus.BAD_REQUEST).send(err.message));
-    })
-    .catch(err => next(err));
-}
-
-function listCollectionQuotes(req, res, next) {
-  QuoteCollection.findById(req.params.id)
-    .then(quoteCollection => {
-      if (!quoteCollection) {
-        return res.status(HTTPStatus.NO_CONTENT).end();
-      }
-      return quoteCollection.getQuotes()
-        .then(quotes => res.status(HTTPStatus.OK).send(quotes));
-    })
-    .catch(err => next(err));
-}
-
-function addCollaborators(req, res, next) {
-  const collaboratorIds = req.body.collaboratorIds;
-  QuoteCollection.findOne(req.params.id)
-    .then(quoteCollection => {
-      if (!quoteCollection) {
-        return res.status(HTTPStatus.NO_CONTENT).end();
-      }
-      return quoteCollection.addCollaborators(collaboratorIds)
-        .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection));
-    })
-    .catch(err => next(err));
-}
-
-function removeCollaborators(req, res, next) {
-  const collaboratorIds = req.body.collaboratorIds || [];
-  QuoteCollection.findById(req.params.id)
-    .then(quoteCollection => {
-      if (!quoteCollection) {
-        return res.status(HTTPStatus.NO_CONTENT).end();
-      }
-      return quoteCollection.removeCollaborators(collaboratorIds)
-        .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection));
-    })
-    .catch(err => next(err));
-}
-
-function listCollaborators(req, res, next) {
-  QuoteCollection.findById(req.params.id)
-    .then(quoteCollection => {
-      if (!quoteCollection) {
-        return res.status(HTTPStatus.NO_CONTENT).end();
-      }
-      return quoteCollection.getCollaborators()
-        .then(collaborators => res.status(HTTPStatus.OK).send(collaborators));
-    })
-    .catch(err => next(err));
-}
 
