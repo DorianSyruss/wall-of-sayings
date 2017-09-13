@@ -5,6 +5,7 @@ const { OperationalError } = require('bluebird');
 const { Schema } = mongoose;
 const { ObjectId } = Schema;
 const { Types } = require('../models/quote');
+const { actions } = require('../models/helpers');
 const toArray = require('lodash/toArray');
 
 const quoteCollection = new Schema({
@@ -31,26 +32,20 @@ const quoteCollection = new Schema({
 
 Object.assign(quoteCollection.methods, {
 
-  addQuote(quoteId, userId) {
+  updateQuotes(quoteId, userId, action) {
     return mongoose.model('Quote').findById(quoteId)
       .then(quote => {
         if (!quote) {
           return Promise.reject(new OperationalError('Quote not found'));
         }
-
-        this.quotes.addToSet(quote.id);
-        quote.trackUser(userId); //remember(track) the user that saved the quote
-        return quote.countFavorites();
-    })
-      .then(() => this.save());
-  },
-
-  removeQuote(quoteId, userId) {
-    return mongoose.model('Quote').findById(quoteId)
-      .then(quote => {
-
-        this.quotes.remove(quoteId);
-        quote.untrackUser(userId);
+        else if (action === actions.Add) {
+          this.quotes.addToSet(quote.id);
+          quote.trackUser(userId); //remember(track) the user that saved the quote
+        }
+        else if (action === actions.Remove) {
+          this.quotes.remove(quote.id);
+          quote.untrackUser(userId);
+        }
         return quote.countFavorites();
       })
       .then(() => this.save());
@@ -64,9 +59,16 @@ Object.assign(quoteCollection.methods, {
     return Quote.findMany(query);
   },
 
-  addCollaborators(collaborator_ids = []) {
-    this.collaborators.addToSet(...collaborator_ids);
-    return this.save();
+  updateCollaborators(collaboratorId, action) {
+    return mongoose.model('User').findById(collaboratorId)
+      .then(user => {
+        if (!user) {
+          return Promise.reject(new OperationalError('User not found'));
+        }
+        else if (action === actions.Add) this.collaborators.addToSet(user.id);
+        else if (action === actions.Remove) this.collaborators.remove(user.id);
+      })
+      .then(() => this.save());
   },
 
   removeCollaborators(collaborators_ids = []) {
@@ -78,10 +80,6 @@ Object.assign(quoteCollection.methods, {
     const privateData = ['password'];
     const User = mongoose.model('User');
     return User.findMany({ _id: this.collaborators }).omit(privateData);
-  },
-
-  isCollaboratedBy(userId) {
-    return this.find({ collaborators: { $in: userId } });
   }
 
 });

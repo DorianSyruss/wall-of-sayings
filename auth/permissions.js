@@ -8,7 +8,7 @@ const get = require('lodash/get');
 const user = new ConnectRoles({
   async: true,
   failureHandler(req, res, action) {
-    res.status(HTTPStatus.UNAUTHORIZED).send(`Not ${action}`);
+    res.status(HTTPStatus.UNAUTHORIZED).send(`Can't ${action}`);
   }
 });
 

@@ -32,6 +32,11 @@ const filter = {
   false: 'false'
 };
 
+const actions = {
+  Add: 'add',
+  Remove: 'remove'
+};
+
 //password validation
 const passwordSchema = new passwordValidator();
 passwordSchema
@@ -43,7 +48,7 @@ passwordSchema
   .has().not().spaces() // Should not have spaces
   .is().not().oneOf(['Password', 'password', 'password123']); // Blacklist these values
 
-module.exports = { omit, pick, hash, passwordSchema, Types, filter };
+module.exports = { omit, pick, hash, passwordSchema, Types, filter, actions };
 
 Object.assign(mongoose.Model, {
   findMany(query = {}) {
