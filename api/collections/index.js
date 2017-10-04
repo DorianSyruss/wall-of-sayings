@@ -6,7 +6,8 @@ const QuoteCollection = require('../../models/quoteCollection');
 const dropProperties = require('lodash/omit');
 const pickProperties = require('lodash/pick');
 const get = require('lodash/get');
-const { user } = require('../../auth/permissions');
+const { Types } = require('../../models/helpers');
+const { user } = require('./permissions');
 //props to omit for this data model, safety measure
 const immutables = ['owner'];
 const defaultLimit = 50;
@@ -51,8 +52,19 @@ router.delete('/collections/:id',
   deleteQuoteCollection
 );
 
-router.get('/collections/:id/collaborators', user.is('auth'), listCollaborators);
-router.get('/collections/:id/quotes', user.is('auth'), listCollectionQuotes);
+router.get('/collections/:id/collaborators',
+  user.is('auth'),
+  setContext(QuoteCollection, 'getCollection'),
+  user.can('view'),
+  listCollaborators
+);
+
+router.get('/collections/:id/quotes',
+  user.is('auth'),
+  setContext(QuoteCollection, 'getCollection'),
+  user.can('view'),
+  listCollectionQuotes
+);
 
 module.exports = router;
 
@@ -133,26 +145,22 @@ function deleteQuoteCollection(req, res, next) {
 }
 
 function listCollectionQuotes(req, res, next) {
-  QuoteCollection.findById(req.params.id)
-    .then(quoteCollection => {
-      if (!quoteCollection) {
-        return res.status(HTTPStatus.NO_CONTENT).end();
-      }
-      return quoteCollection.getQuotes()
-        .then(quotes => res.status(HTTPStatus.OK).send(quotes));
-    })
+  const quoteCollection = req.ctx.collection;
+  const showAll = quoteCollection.isOwner(req.user) ||
+    quoteCollection.isCollaborator(req.user);
+  const filter = showAll ? {} : { type: Types.Public };
+
+   quoteCollection.getQuotes(filter)
+    .then(quotes => res.status(HTTPStatus.OK).send(quotes))
     .catch(err => next(err));
 }
 
 function listCollaborators(req, res, next) {
-  QuoteCollection.findById(req.params.id)
-    .then(quoteCollection => {
-      if (!quoteCollection) {
-        return res.status(HTTPStatus.NO_CONTENT).end();
-      }
-      return quoteCollection.getCollaborators()
-        .then(collaborators => res.status(HTTPStatus.OK).send(collaborators));
-    })
+  const quoteCollection = req.ctx.collection;
+
+  if (!quoteCollection) res.status(HTTPStatus.NO_CONTENT).end();
+  else return quoteCollection.getCollaborators()
+    .then(quotes => res.status(HTTPStatus.OK).send(quotes))
     .catch(err => next(err));
 }
 

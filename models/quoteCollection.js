@@ -80,6 +80,14 @@ Object.assign(quoteCollection.methods, {
     const privateData = ['password'];
     const User = mongoose.model('User');
     return User.findMany({ _id: this.collaborators }).omit(privateData);
+  },
+
+  isOwner(user) {
+    return this.owner === user.id;
+  },
+
+  isCollaborator(user) {
+    return this.collaborators.includes(user.id);
   }
 
 });

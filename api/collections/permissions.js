@@ -10,13 +10,13 @@ user.use('view', (req, res) => {
   //public quotes can be seen by any logged in user,
   //collaborators and owner covers private collections
 
-  let query = { $or: [{
-    collaborators: { $in: [req.user.id] }
-  }, {
-    owner: req.user.id
-  }, {
-    type: Types.Public
-  }] };
+  let query = {
+    $or: [
+      { collaborators: { $in: [req.user.id] } },
+      { owner: req.user.id },
+      { type: Types.Public }
+    ]
+  };
 
   if (req.user.role === Roles.Admin) query = {};
   return req.ctx.getCollection(query)
@@ -28,11 +28,12 @@ user.use('view', (req, res) => {
 });
 
 user.use('edit', (req, res) => {
-  let query = { $or: [{
-    collaborators: { $in: [req.user.id] }
-  }, {
-    owner: req.user.id
-  }] };
+  let query = {
+    $or: [
+      { collaborators: { $in: [req.user.id] } },
+      { owner: req.user.id }
+    ]
+  };
 
   if (req.user.role === Roles.Admin) query = {};
   return req.ctx.getCollection(query)
@@ -56,3 +57,5 @@ user.use('delete', (req, res) => {
       return true;
     });
 });
+
+module.exports = { user };
