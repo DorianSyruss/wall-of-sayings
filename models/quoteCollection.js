@@ -83,11 +83,11 @@ Object.assign(quoteCollection.methods, {
   },
 
   isOwner(user) {
-    return this.owner === user.id;
+    return this.owner.toString() === user.id;
   },
 
   isCollaborator(user) {
-    return this.collaborators.includes(user.id);
+    return this.collaborators.some(it => it.toString() === user.id);
   }
 
 });

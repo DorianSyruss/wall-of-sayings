@@ -9,8 +9,8 @@ const { Types } = require('../../models/quote');
 const defaultLimit = 50;
 
 router.get('/public/collections', user.is('auth'), listPublicCollections);
-router.get('/public/collections/:id/quotes', user.is('auth'), listPublicCollectionQuotes);
-router.get('/public/collections/:id/collaborators', user.is('auth'), listPublicCollectionCollaborators);
+
+module.exports = router;
 
 // -----> Public routes, accessible with any role <------
 
@@ -32,28 +32,3 @@ function listPublicCollections(req, res, next) {
     .catch(err => next(err));
 }
 
-function listPublicCollectionQuotes(req, res, next) {
-  const query = { type: Types.Public, _id: req.params.id };
-  QuoteCollection.findOne(query)
-    .then(quoteCollection => {
-      if (!quoteCollection) {
-        return res.status(HTTPStatus.NO_CONTENT).end();
-      }
-      return quoteCollection.getQuotes({ type: Types.Public })
-        .then(quotes => res.status(HTTPStatus.OK).send(quotes));
-    })
-    .catch(err => next(err));
-}
-
-function listPublicCollectionCollaborators(req, res, next) {
-  const query = { type: Types.Public, _id: req.params.id };
-  QuoteCollection.findById(query)
-    .then(quoteCollection => {
-      if (!quoteCollection) {
-        return res.status(HTTPStatus.NO_CONTENT).end();
-      }
-      return quoteCollection.getCollaborators()
-        .then(collaborators => res.status(HTTPStatus.OK).send(collaborators));
-    })
-    .catch(err => next(err));
-}

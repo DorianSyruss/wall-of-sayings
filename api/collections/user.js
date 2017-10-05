@@ -10,8 +10,8 @@ const defaultLimit = 50;
 
 
 router.get('/me/collections', user.is('auth'), listMyCollections);
-router.get('/me/collections/:id/collaborators', user.is('auth'), listMyCollaborators);
-router.get('/me/collections/:id/quotes', user.is('auth'), listMyCollectionQuotes);
+
+module.exports = router;
 
 function listMyCollections(req, res, next) {
   const properties = ['category', 'type'];
@@ -34,28 +34,3 @@ function listMyCollections(req, res, next) {
     .catch(err => next(err));
 }
 
-function listMyCollaborators(req, res, next) {
-  const query = { owner: req.user.id, _id: req.params.id };
-  QuoteCollection.findById(query)
-    .then(quoteCollection => {
-      if (!quoteCollection) {
-        return res.status(HTTPStatus.NO_CONTENT).end();
-      }
-      return quoteCollection.getCollaborators()
-        .then(collaborators => res.status(HTTPStatus.OK).send(collaborators));
-    })
-    .catch(err => next(err));
-}
-
-function listMyCollectionQuotes(req, res, next) {
-  const query = { owner: req.user.id, _id: req.params.id };
-  QuoteCollection.findOne(query)
-    .then(quoteCollection => {
-      if (!quoteCollection) {
-        return res.status(HTTPStatus.NO_CONTENT).end();
-      }
-      return quoteCollection.getQuotes()
-        .then(quotes => res.status(HTTPStatus.OK).send(quotes));
-    })
-    .catch(err => next(err));
-}

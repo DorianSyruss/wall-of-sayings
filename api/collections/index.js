@@ -4,71 +4,75 @@ const HTTPStatus = require('http-status');
 const router = require('express').Router();
 const QuoteCollection = require('../../models/quoteCollection');
 const dropProperties = require('lodash/omit');
-const pickProperties = require('lodash/pick');
 const get = require('lodash/get');
 const { Types } = require('../../models/helpers');
 const { user } = require('./permissions');
 //props to omit for this data model, safety measure
 const immutables = ['owner'];
-const defaultLimit = 50;
 
 router.post('/collections', user.is('auth'),  createQuoteCollection);
 
 //role based authorization
-router.get('/collections', user.is('auth'), user.is('admin'), listQuoteCollections);
+router.get('/collections',
+  user.is('auth'),
+  setContextMany(QuoteCollection, 'getCollections'),
+  user.can('list'),
+  listQuoteCollections
+);
 
 router.get('/collections/:id',
   user.is('auth'),
-  setContext(QuoteCollection, 'getCollection'),
+  setContextOne(QuoteCollection, 'getCollection'),
   user.can('view'),
   getQuoteCollection
 );
 
 router.put('/collections/:id',
   user.is('auth'),
-  setContext(QuoteCollection, 'getCollection'),
+  setContextOne(QuoteCollection, 'getCollection'),
   user.can('edit'),
   updateQuoteCollection
 );
 
 router.put('/collections/:id/quotes/:action',
   user.is('auth'),
-  setContext(QuoteCollection, 'getCollection'),
+  setContextOne(QuoteCollection, 'getCollection'),
   user.can('edit'),
   updateQuotesInCollection
 );
 
 router.put('/collections/:id/collaborators/:action',
   user.is('auth'),
-  setContext(QuoteCollection, 'getCollection'),
+  setContextOne(QuoteCollection, 'getCollection'),
   user.can('edit'),
   updateCollaborators
 );
 
 router.delete('/collections/:id',
   user.is('auth'),
-  setContext(QuoteCollection, 'getCollection'),
+  setContextOne(QuoteCollection, 'getCollection'),
   user.can('delete'),
   deleteQuoteCollection
 );
 
 router.get('/collections/:id/collaborators',
   user.is('auth'),
-  setContext(QuoteCollection, 'getCollection'),
+  setContextOne(QuoteCollection, 'getCollection'),
   user.can('view'),
   listCollaborators
 );
 
 router.get('/collections/:id/quotes',
   user.is('auth'),
-  setContext(QuoteCollection, 'getCollection'),
+  setContextOne(QuoteCollection, 'getCollection'),
   user.can('view'),
   listCollectionQuotes
 );
 
 module.exports = router;
 
-function setContext(model, name, path = 'params.id') {
+//set context for one item
+function setContextOne(model, name, path = 'params.id') {
   return function(req, res, next) {
     const id = get(req, path);
     req.ctx = {
@@ -81,19 +85,24 @@ function setContext(model, name, path = 'params.id') {
   };
 }
 
+function setContextMany(model, name) {
+  return function(req, res, next) {
+    req.ctx = {
+      [name](query = {}) {
+        return model.findMany(query);
+      }
+    };
+    next();
+  };
+}
+
 // -----> Routes <------
 
 function listQuoteCollections(req, res, next) {
-  const properties = ['owner', 'category', 'type'];
-  const query = pickProperties(req.query, properties);
-  const offset = parseInt(req.query.offset, 10) || 0;
-  const limit = parseInt(req.query.limit, 10) || defaultLimit;
 
-  QuoteCollection.find(query)
-    .skip(offset)
-    .limit(limit)
-    .then(collection => res.status(HTTPStatus.OK).send(collection))
-    .catch(err => next(err));
+  const collections = req.ctx.collections;
+  res.status(HTTPStatus.OK).send(collections);
+
 }
 
 function getQuoteCollection(req, res, next) {

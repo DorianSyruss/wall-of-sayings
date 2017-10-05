@@ -6,6 +6,7 @@ const passwordValidator = require('password-validator');
 const mongoose = require('mongoose');
 const omitBy = require('lodash/omitBy');
 const mapValues = require('lodash/mapValues');
+const startsWith = require('lodash/startsWith');
 
 function pick(props = []) {
   const include = props.map(prop => `${prop}`).join(' ');
@@ -52,7 +53,11 @@ module.exports = { omit, pick, hash, passwordSchema, Types, filter, actions };
 
 Object.assign(mongoose.Model, {
   findMany(query = {}) {
-    let filter = mapValues(query, val => Array.isArray(val) ? { $in: val } : val);
+    let filter = mapValues(query, (val, key) => {
+      if (startsWith(key, '$')) return val;
+      if (Array.isArray(val)) return { $in: val };
+      return val;
+    });
     filter = omitBy(filter, val => val === '*');
 
     return this.find(filter);
