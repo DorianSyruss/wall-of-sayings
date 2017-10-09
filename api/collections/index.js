@@ -4,9 +4,9 @@ const HTTPStatus = require('http-status');
 const router = require('express').Router();
 const QuoteCollection = require('../../models/quoteCollection');
 const dropProperties = require('lodash/omit');
-const get = require('lodash/get');
 const { Types } = require('../../models/helpers');
 const { user } = require('./permissions');
+const { setContextOne, setContextMany } = require('../helpers');
 //props to omit for this data model, safety measure
 const immutables = ['owner'];
 
@@ -16,93 +16,66 @@ router.post('/collections', user.is('auth'),  createQuoteCollection);
 router.get('/collections',
   user.is('auth'),
   setContextMany(QuoteCollection, 'getCollections'),
-  user.can('list'),
+  user.can('listCollections'),
   listQuoteCollections
 );
 
 router.get('/collections/:id',
   user.is('auth'),
   setContextOne(QuoteCollection, 'getCollection'),
-  user.can('view'),
+  user.can('viewCollection'),
   getQuoteCollection
 );
 
 router.put('/collections/:id',
   user.is('auth'),
   setContextOne(QuoteCollection, 'getCollection'),
-  user.can('edit'),
+  user.can('editCollection'),
   updateQuoteCollection
 );
 
 router.put('/collections/:id/quotes/:action',
   user.is('auth'),
   setContextOne(QuoteCollection, 'getCollection'),
-  user.can('edit'),
+  user.can('editCollection'),
   updateQuotesInCollection
 );
 
 router.put('/collections/:id/collaborators/:action',
   user.is('auth'),
   setContextOne(QuoteCollection, 'getCollection'),
-  user.can('edit'),
+  user.can('editCollection'),
   updateCollaborators
 );
 
 router.delete('/collections/:id',
   user.is('auth'),
   setContextOne(QuoteCollection, 'getCollection'),
-  user.can('delete'),
+  user.can('deleteCollection'),
   deleteQuoteCollection
 );
 
 router.get('/collections/:id/collaborators',
   user.is('auth'),
   setContextOne(QuoteCollection, 'getCollection'),
-  user.can('view'),
+  user.can('viewCollection'),
   listCollaborators
 );
 
 router.get('/collections/:id/quotes',
   user.is('auth'),
   setContextOne(QuoteCollection, 'getCollection'),
-  user.can('view'),
+  user.can('viewCollection'),
   listCollectionQuotes
 );
 
 module.exports = router;
 
-//set context for one item
-function setContextOne(model, name, path = 'params.id') {
-  return function(req, res, next) {
-    const id = get(req, path);
-    req.ctx = {
-      [name](options = {}) {
-        const query = Object.assign({ _id: id }, options);
-        return model.findOne(query);
-      }
-    };
-    next();
-  };
-}
-
-function setContextMany(model, name) {
-  return function(req, res, next) {
-    req.ctx = {
-      [name](query = {}) {
-        return model.findMany(query);
-      }
-    };
-    next();
-  };
-}
-
 // -----> Routes <------
 
 function listQuoteCollections(req, res, next) {
-
   const collections = req.ctx.collections;
   res.status(HTTPStatus.OK).send(collections);
-
 }
 
 function getQuoteCollection(req, res, next) {
@@ -116,7 +89,7 @@ function updateQuoteCollection(req, res, next) {
 
   quoteCollection.set(data);
   quoteCollection.save()
-    .then(quote => res.status(HTTPStatus.OK).send(quote))
+    .then(quoteCollection => res.status(HTTPStatus.OK).send(quoteCollection))
     .catch(err => next(err));
 }
 
@@ -173,6 +146,8 @@ function listCollaborators(req, res, next) {
     .catch(err => next(err));
 }
 
+//todo [optional]: make rule to specify who can create (user and admin or just user)
+//do we want admin considered as user?
 function createQuoteCollection(req, res, next) {
   const collectionData = req.body;
   collectionData.owner = req.user.id;

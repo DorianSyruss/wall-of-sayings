@@ -10,7 +10,7 @@ const Roles = require('../../models/user').roles;
 
 const defaultLimit = 50;
 
-user.use('list', (req, res) => {
+user.use('listCollections', (req, res) => {
   const properties = ['owner', 'category', 'type', 'collaborations'];
   const { owner, category, type, collaborations } = pickProperties(req.query, properties);
   const offset = parseInt(req.query.offset, 10) || 0;
@@ -45,8 +45,8 @@ user.use('list', (req, res) => {
     });
 });
 
-user.use('view', (req, res) => {
-  //public quotes can be seen by any logged in user,
+user.use('viewCollection', (req, res) => {
+  //public collections can be seen by any logged in user,
   //collaborators and owner covers private collections
 
   let query = {
@@ -66,7 +66,7 @@ user.use('view', (req, res) => {
     });
 });
 
-user.use('edit', (req, res) => {
+user.use('editCollection', (req, res) => {
   let query = {
     $or: [
       { collaborators: { $in: [req.user.id] } },
@@ -83,7 +83,7 @@ user.use('edit', (req, res) => {
     });
 });
 
-user.use('delete', (req, res) => {
+user.use('deleteCollection', (req, res) => {
   let query = {
     owner: req.user.id
   };

@@ -2,7 +2,7 @@
 
 const auth = require('./auth');
 const users = require('./users');
-const quotes = require('./quotes');
+const quotes = require('./quotes/index');
 const collections = require('./collections/index');
 
 module.exports = app => {
